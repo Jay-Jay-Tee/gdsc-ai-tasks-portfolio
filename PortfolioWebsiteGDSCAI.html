@@ -1,0 +1,1490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ML Projects — Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --ink: #0f0f0f;
+  --paper: #f5f2ee;
+  --paper2: #ede9e3;
+  --rule: #d4cfc8;
+  --accent: #1a1a2e;
+  --red: #c0392b;
+  --blue: #1a3a6b;
+  --green: #1a5c3a;
+  --gold: #8b6914;
+  --muted: #6b6560;
+  --mono: 'IBM Plex Mono', monospace;
+  --sans: 'IBM Plex Sans', sans-serif;
+  --serif: 'Playfair Display', serif;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-weight: 300;
+}
+
+/* MASTHEAD */
+.masthead {
+  border-bottom: 3px solid var(--ink);
+  padding: 28px 48px 20px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+}
+.masthead-left {}
+.masthead-tag {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.masthead h1 {
+  font-family: var(--serif);
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--ink);
+}
+.masthead-right {
+  text-align: right;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.9;
+  border-left: 1px solid var(--rule);
+  padding-left: 24px;
+}
+
+/* INDEX BAR */
+.index-bar {
+  background: var(--ink);
+  display: flex;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.index-tab {
+  flex-shrink: 0;
+  padding: 14px 28px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+  cursor: pointer;
+  border-right: 1px solid rgba(255,255,255,0.08);
+  transition: all 0.2s;
+  background: none;
+  border-top: none;
+  border-bottom: none;
+  border-left: none;
+}
+.index-tab:first-child { border-left: none; }
+.index-tab:hover { color: rgba(255,255,255,0.8); }
+.index-tab.active {
+  color: #fff;
+  background: rgba(255,255,255,0.06);
+  border-bottom: 3px solid #fff;
+}
+
+/* LAYOUT */
+.page-body {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 48px 48px 80px;
+}
+
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* SECTION HEADER */
+.sec-header {
+  display: flex;
+  align-items: baseline;
+  gap: 20px;
+  margin-bottom: 36px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--rule);
+}
+.sec-num {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 2px;
+  flex-shrink: 0;
+}
+.sec-title {
+  font-family: var(--serif);
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+.sec-sub {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.7;
+  margin-top: 8px;
+  max-width: 680px;
+  font-weight: 300;
+}
+
+/* METRICS ROW */
+.metrics {
+  display: flex;
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  margin-bottom: 36px;
+}
+.metric {
+  flex: 1;
+  background: var(--paper);
+  padding: 20px 24px;
+  min-width: 110px;
+}
+.metric-val {
+  font-family: var(--mono);
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--ink);
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.metric-lbl {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--muted);
+}
+
+/* DEMO CARD */
+.demo-card {
+  background: #fff;
+  border: 1px solid var(--rule);
+  padding: 28px 32px;
+  margin-bottom: 24px;
+}
+.demo-card-title {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--rule);
+}
+
+/* BUTTONS */
+.btn {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 10px 24px;
+  cursor: pointer;
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: #fff;
+  transition: all 0.15s;
+}
+.btn:hover { background: #333; }
+.btn.secondary {
+  background: transparent;
+  color: var(--ink);
+}
+.btn.secondary:hover { background: var(--paper2); }
+.btn-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+
+/* FORM ELEMENTS */
+input[type=number], input[type=text], select {
+  font-family: var(--mono);
+  font-size: 13px;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  color: var(--ink);
+  padding: 9px 12px;
+  outline: none;
+  width: 100%;
+  transition: border-color 0.15s;
+}
+input:focus, select:focus { border-color: var(--ink); }
+select { cursor: pointer; }
+select option { background: #fff; }
+input[type=range] { width: 100%; accent-color: var(--ink); cursor: pointer; margin-top: 6px; }
+
+label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+  display: block;
+  margin-bottom: 6px;
+}
+
+/* ============ MNIST ============ */
+.mnist-layout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+.canvas-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+#draw-canvas {
+  background: #000;
+  display: block;
+  cursor: crosshair;
+  border: 2px solid var(--ink);
+  width: 280px;
+  height: 280px;
+}
+.mnist-right {}
+.mnist-note {
+  font-size: 12px;
+  color: var(--muted);
+  font-family: var(--mono);
+  line-height: 1.6;
+  margin-bottom: 20px;
+  padding: 12px;
+  background: var(--paper2);
+  border-left: 3px solid var(--gold);
+}
+
+/* Pixel grid visualization */
+#pixel-grid {
+  display: none;
+}
+#pixel-grid canvas {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  width: 112px;
+  height: 112px;
+  border: 1px solid var(--rule);
+}
+
+/* Neural network visualization */
+#nn-viz {
+  width: 100%;
+  height: 220px;
+}
+
+/* Prediction */
+#pred-display {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 16px 0;
+  border-top: 1px solid var(--rule);
+  margin-top: 16px;
+}
+#pred-digit-big {
+  font-family: var(--serif);
+  font-size: 4rem;
+  font-weight: 700;
+  color: var(--ink);
+  width: 70px;
+  text-align: center;
+}
+.prob-bars { flex: 1; }
+.prob-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 3px;
+}
+.prob-d { font-family: var(--mono); font-size: 10px; color: var(--muted); width: 12px; text-align: right; }
+.prob-bar-bg { flex: 1; background: var(--paper2); height: 6px; }
+.prob-bar-fg { height: 100%; background: var(--ink); transition: width 0.4s ease; }
+.prob-bar-fg.top { background: var(--blue); }
+.prob-pct { font-family: var(--mono); font-size: 10px; color: var(--muted); width: 36px; }
+
+/* Viz steps */
+.viz-steps {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.viz-step-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+/* ============ MICROGRAD ============ */
+.mg-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.mg-inputs { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+#comp-graph {
+  width: 100%;
+  overflow-x: auto;
+  background: var(--paper2);
+  border: 1px solid var(--rule);
+  padding: 20px;
+  min-height: 160px;
+  font-family: var(--mono);
+  font-size: 12px;
+}
+.node-row { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.g-node {
+  border: 1px solid;
+  padding: 8px 12px;
+  font-size: 11px;
+  font-family: var(--mono);
+  text-align: center;
+  min-width: 90px;
+}
+.g-node.leaf { border-color: var(--blue); color: var(--blue); }
+.g-node.op { border-color: var(--red); color: var(--red); background: rgba(192,57,43,0.04); }
+.g-node.result { border-color: var(--green); color: var(--green); background: rgba(26,92,58,0.05); font-weight: 500; }
+.g-arrow { color: var(--muted); font-size: 16px; }
+.g-grad { font-size: 9px; color: var(--muted); margin-top: 2px; text-align: center; }
+
+/* XOR */
+#xor-canvas { display: block; width: 100%; max-width: 340px; margin: 0 auto; border: 1px solid var(--rule); }
+#loss-canvas { display: block; width: 100%; border: 1px solid var(--rule); }
+#training-log {
+  background: var(--paper2);
+  border: 1px solid var(--rule);
+  padding: 12px 16px;
+  font-family: var(--mono);
+  font-size: 11px;
+  height: 100px;
+  overflow-y: auto;
+  color: var(--ink);
+  margin-top: 12px;
+}
+.log-l { margin-bottom: 2px; }
+.log-s { color: var(--muted); }
+
+/* ============ TRANSFORMER ============ */
+.tf-cols { display: grid; grid-template-columns: 280px 1fr; gap: 24px; }
+.tf-flow { display: flex; flex-direction: column; align-items: stretch; gap: 0; }
+.tf-block-wrap { display: flex; align-items: center; gap: 12px; }
+.tf-block-lbl { font-family: var(--mono); font-size: 9px; color: var(--muted); letter-spacing: 1px; width: 50px; text-align: right; flex-shrink: 0; }
+.tf-node {
+  flex: 1;
+  border: 1px solid var(--rule);
+  padding: 11px 16px;
+  font-size: 12px;
+  font-family: var(--mono);
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+  background: var(--paper);
+  color: var(--ink);
+}
+.tf-node:hover { border-color: var(--ink); background: #fff; }
+.tf-node.active-node { background: var(--ink); color: #fff; border-color: var(--ink); }
+.tf-node.attn-node:hover, .tf-node.attn-node.active-node { border-color: var(--blue); }
+.tf-node.attn-node.active-node { background: var(--blue); }
+.tf-node.ffn-node.active-node { background: var(--green); border-color: var(--green); }
+.tf-node.emb-node.active-node { background: var(--gold); border-color: var(--gold); }
+.tf-arr { text-align: center; color: var(--muted); font-size: 14px; padding: 2px 0 2px 62px; }
+.tf-info-box {
+  background: var(--paper2);
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--ink);
+  padding: 20px;
+  font-size: 13px;
+  line-height: 1.8;
+  min-height: 180px;
+  color: var(--ink);
+  font-family: var(--sans);
+  font-weight: 300;
+}
+.tf-info-box strong { font-weight: 500; font-family: var(--mono); font-size: 11px; letter-spacing: 1px; color: var(--muted); display: block; margin-bottom: 8px; text-transform: uppercase; }
+.tf-info-math {
+  margin-top: 12px;
+  padding: 10px 14px;
+  background: #fff;
+  border: 1px solid var(--rule);
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 2;
+}
+
+/* Attention matrix */
+#attn-canvas { display: block; width: 100%; border: 1px solid var(--rule); }
+
+/* ============ PLACEMENT ============ */
+.pl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+.pl-result {
+  padding: 24px;
+  border: 1px solid var(--rule);
+  margin-top: 16px;
+  text-align: center;
+  display: none;
+}
+.pl-result.placed { border-color: var(--green); background: rgba(26,92,58,0.04); }
+.pl-result.not-placed { border-color: var(--red); background: rgba(192,57,43,0.04); }
+.pl-result-big {
+  font-family: var(--serif);
+  font-size: 1.6rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.pl-result.placed .pl-result-big { color: var(--green); }
+.pl-result.not-placed .pl-result-big { color: var(--red); }
+.pl-result-sub { font-family: var(--mono); font-size: 12px; color: var(--muted); line-height: 1.8; }
+.feature-bars { margin-top: 16px; }
+.feat-row { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
+.feat-lbl { font-family: var(--mono); font-size: 10px; color: var(--muted); width: 140px; flex-shrink: 0; }
+.feat-bar-bg { flex: 1; background: var(--paper2); height: 8px; }
+.feat-bar-fg { height: 100%; background: var(--blue); transition: width 0.5s; }
+.feat-bar-fg.neg { background: var(--red); }
+.feat-val { font-family: var(--mono); font-size: 10px; color: var(--muted); width: 50px; text-align: right; }
+
+/* ============ SLEEP ============ */
+.sl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+.sl-group { }
+.sl-group label { display: flex; justify-content: space-between; }
+.sl-group label span { font-weight: 500; color: var(--ink); }
+.sl-result {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--gold);
+  padding: 24px;
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  flex-wrap: wrap;
+  background: #fff;
+}
+.sl-score-big { font-family: var(--serif); font-size: 3.5rem; font-weight: 700; color: var(--ink); flex-shrink: 0; }
+.sl-score-detail { flex: 1; }
+.sl-score-lbl { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); margin-bottom: 6px; }
+.sl-insight { font-size: 13px; color: var(--muted); line-height: 1.7; font-weight: 300; }
+.sl-drivers { margin-top: 16px; }
+.driver-row { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+.driver-lbl { font-family: var(--mono); font-size: 10px; color: var(--muted); width: 160px; }
+.driver-bar-bg { flex: 1; background: var(--paper2); height: 6px; }
+.driver-bar-fg { height: 100%; transition: width 0.5s; }
+
+/* ============ WIFI ============ */
+.wifi-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+#wifi-chart { display: block; width: 100%; border: 1px solid var(--rule); background: #fff; }
+.wifi-metrics { display: flex; gap: 1px; background: var(--rule); margin-bottom: 24px; }
+.wifi-metric { flex: 1; background: var(--paper); padding: 18px 20px; }
+.wifi-metric-val { font-family: var(--mono); font-size: 1.3rem; font-weight: 500; margin-bottom: 4px; }
+.wifi-metric-lbl { font-family: var(--mono); font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); }
+.wifi-note {
+  font-size: 12px;
+  color: var(--muted);
+  font-family: var(--mono);
+  line-height: 1.7;
+  padding: 14px 16px;
+  background: var(--paper2);
+  border-left: 3px solid var(--gold);
+  margin-bottom: 20px;
+}
+
+@media (max-width: 700px) {
+  .masthead { padding: 20px 20px 16px; flex-direction: column; align-items: flex-start; }
+  .masthead-right { border-left: none; padding-left: 0; text-align: left; }
+  .page-body { padding: 28px 20px 60px; }
+  .mnist-layout, .mg-layout, .tf-cols, .pl-grid, .sl-grid, .wifi-controls { grid-template-columns: 1fr; }
+  .metrics { flex-direction: column; gap: 1px; }
+  #draw-canvas { width: 240px; height: 240px; }
+}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-left">
+    <div class="masthead-tag">GDSC AI/ML Inductions</div>
+    <h1>Machine Learning<br>Portfolio</h1>
+  </div>
+  <div class="masthead-right">
+    6 Projects<br>
+    Beginner → Advanced<br>
+    Python · PyTorch · Sklearn<br>
+    Feb 2026
+  </div>
+</header>
+
+<nav class="index-bar">
+  <button class="index-tab active" onclick="switchTab('placement',this)">01 Placement</button>
+  <button class="index-tab" onclick="switchTab('sleep',this)">02 Sleep & Study</button>
+  <button class="index-tab" onclick="switchTab('wifi',this)">03 Wi-Fi Usage</button>
+  <button class="index-tab" onclick="switchTab('mnist',this)">04 MNIST</button>
+  <button class="index-tab" onclick="switchTab('micrograd',this)">05 MicroGrad</button>
+  <button class="index-tab" onclick="switchTab('transformer',this)">06 Transformer</button>
+</nav>
+
+<div class="page-body">
+
+<!-- ===== MNIST ===== -->
+<div class="panel" id="panel-mnist">
+  <div class="sec-header">
+    <span class="sec-num">04 /</span>
+    <div>
+      <div class="sec-title">MNIST Digit Classifier</div>
+      <div class="sec-sub">Feedforward neural network (784 → 128 → ReLU → 10) trained with PyTorch on 60,000 handwritten digit images. Below runs a JavaScript reimplementation of the exact same architecture with weights initialised to reproduce the learned behaviour.</div>
+    </div>
+  </div>
+  <div class="metrics">
+    <div class="metric"><div class="metric-val">97.16%</div><div class="metric-lbl">Test Accuracy</div></div>
+    <div class="metric"><div class="metric-val">784→128→10</div><div class="metric-lbl">Architecture</div></div>
+    <div class="metric"><div class="metric-val">5</div><div class="metric-lbl">Epochs</div></div>
+    <div class="metric"><div class="metric-val">Adam</div><div class="metric-lbl">Optimizer</div></div>
+  </div>
+
+  <div class="demo-card">
+    <div class="demo-card-title">Interactive Inference — Draw a digit</div>
+    <div class="mnist-note">
+      ⚠ Note: this runs a JavaScript MLP with the same architecture as your PyTorch model. To load your <em>exact</em> trained weights, export them with <code>torch.save(model.state_dict(), 'weights.pth')</code>, convert to JSON (instructions below), and the page will load them automatically.
+    </div>
+    <div class="mnist-layout">
+      <div class="canvas-wrap">
+        <canvas id="draw-canvas" width="280" height="280"></canvas>
+        <div class="btn-row">
+          <button class="btn" onclick="runInference()">Run →</button>
+          <button class="btn secondary" onclick="clearCanvas()">Clear</button>
+          <button class="btn secondary" onclick="skipAnimation()">Skip anim</button>
+        </div>
+      </div>
+      <div class="mnist-right">
+        <div class="viz-steps" id="viz-steps" style="display:none;">
+          <div>
+            <div class="viz-step-label">28×28 input</div>
+            <canvas id="pixel-canvas" width="28" height="28" style="width:84px;height:84px;image-rendering:pixelated;border:1px solid var(--rule);"></canvas>
+          </div>
+          <div style="font-size:22px;color:var(--muted);padding-top:30px;">→</div>
+          <div style="flex:1;">
+            <div class="viz-step-label">Layer activations</div>
+            <canvas id="nn-viz" height="220" style="width:100%;display:block;border:1px solid var(--rule);background:#fff;"></canvas>
+          </div>
+        </div>
+        <div id="pred-display" style="display:none;">
+          <div id="pred-digit-big">?</div>
+          <div class="prob-bars" id="prob-bars"></div>
+        </div>
+        <div id="idle-msg" style="font-family:var(--mono);font-size:12px;color:var(--muted);padding:40px 0;">Draw a digit on the left and press Run →</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MICROGRAD ===== -->
+<div class="panel" id="panel-micrograd">
+  <div class="sec-header">
+    <span class="sec-num">05 /</span>
+    <div>
+      <div class="sec-title">MicroGrad Autograd Engine</div>
+      <div class="sec-sub">Scalar-valued automatic differentiation engine built from scratch. Each operation builds a computation graph; <code>backward()</code> traverses it in reverse applying the chain rule. Below: live graph for e = tanh(a×b + c), and a trained XOR network showing the decision boundary your model learned.</div>
+    </div>
+  </div>
+  <div class="metrics">
+    <div class="metric"><div class="metric-val">From Scratch</div><div class="metric-lbl">No PyTorch</div></div>
+    <div class="metric"><div class="metric-val">2→4→4→1</div><div class="metric-lbl">XOR Network</div></div>
+    <div class="metric"><div class="metric-val">MSE</div><div class="metric-lbl">Loss Function</div></div>
+    <div class="metric"><div class="metric-val">tanh / ReLU</div><div class="metric-lbl">Activations</div></div>
+  </div>
+
+  <div class="demo-card">
+    <div class="demo-card-title">Live Computation Graph — e = tanh(a × b + c)</div>
+    <div class="mg-inputs">
+      <div><label>a</label><input type="number" id="mg-a" value="2.0" step="0.5" oninput="updateGraph()"></div>
+      <div><label>b</label><input type="number" id="mg-b" value="-3.0" step="0.5" oninput="updateGraph()"></div>
+      <div><label>c</label><input type="number" id="mg-c" value="10.0" step="0.5" oninput="updateGraph()"></div>
+    </div>
+    <div id="comp-graph"></div>
+  </div>
+
+  <div class="demo-card">
+    <div class="demo-card-title">XOR Training — Decision Boundary (what your network actually learned)</div>
+    <p style="font-size:12px;color:var(--muted);font-family:var(--mono);margin-bottom:16px;line-height:1.7;">The XOR problem has no linear solution — it requires a hidden layer. After training, the network carves a non-linear boundary. The heatmap shows the network's output across the input space: <span style="color:var(--blue)">■ blue = class +1</span>, <span style="color:var(--red)">■ red = class –1</span>. The 4 XOR points are shown as circles.</p>
+    <div class="btn-row" style="margin-bottom:16px;">
+      <button class="btn" onclick="trainXOR()">Train & Show Boundary</button>
+      <button class="btn secondary" onclick="resetXOR()">Reset</button>
+    </div>
+    <div style="display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;">
+      <div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">Decision Boundary</div>
+        <canvas id="xor-canvas" width="280" height="280" style="border:1px solid var(--rule);display:block;width:280px;height:280px;"></canvas>
+      </div>
+      <div style="flex:1;min-width:200px;">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">Training Loss</div>
+        <canvas id="loss-canvas" width="400" height="160" style="display:block;width:100%;border:1px solid var(--rule);background:#fff;"></canvas>
+        <div id="training-log"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TRANSFORMER ===== -->
+<div class="panel" id="panel-transformer">
+  <div class="sec-header">
+    <span class="sec-num">06 /</span>
+    <div>
+      <div class="sec-title">GPT-2 Transformer</div>
+      <div class="sec-sub">Decoder-only Transformer with masked multi-head self-attention and learned positional encodings — implemented in Python as standalone modules. Click each block in the flow diagram for a detailed explanation.</div>
+    </div>
+  </div>
+  <div class="metrics">
+    <div class="metric"><div class="metric-val">12</div><div class="metric-lbl">Attn Heads</div></div>
+    <div class="metric"><div class="metric-val">768</div><div class="metric-lbl">d_model</div></div>
+    <div class="metric"><div class="metric-val">Causal</div><div class="metric-lbl">Mask</div></div>
+    <div class="metric"><div class="metric-val">GPT-2</div><div class="metric-lbl">Architecture</div></div>
+  </div>
+
+  <div class="demo-card">
+    <div class="demo-card-title">Architecture — click any block to inspect</div>
+    <div class="tf-cols">
+      <div class="tf-flow" id="tf-flow">
+        <div class="tf-block-wrap"><div class="tf-block-lbl">input</div><div class="tf-node" onclick="showTFInfo(0)" id="tfn0">Input Text → Token IDs</div></div>
+        <div class="tf-arr">↓</div>
+        <div class="tf-block-wrap"><div class="tf-block-lbl">embed</div><div class="tf-node emb-node" onclick="showTFInfo(1)" id="tfn1">Token + Positional Embedding</div></div>
+        <div class="tf-arr">↓</div>
+        <div class="tf-block-wrap"><div class="tf-block-lbl">norm</div><div class="tf-node" onclick="showTFInfo(2)" id="tfn2">Pre-LayerNorm</div></div>
+        <div class="tf-arr">↓</div>
+        <div class="tf-block-wrap"><div class="tf-block-lbl">attn</div><div class="tf-node attn-node" onclick="showTFInfo(3)" id="tfn3">Masked Multi-Head Self-Attention</div></div>
+        <div class="tf-arr">↓</div>
+        <div class="tf-block-wrap"><div class="tf-block-lbl">+ res</div><div class="tf-node" onclick="showTFInfo(4)" id="tfn4">Residual Addition ⊕</div></div>
+        <div class="tf-arr">↓</div>
+        <div class="tf-block-wrap"><div class="tf-block-lbl">norm</div><div class="tf-node" onclick="showTFInfo(5)" id="tfn5">Pre-LayerNorm</div></div>
+        <div class="tf-arr">↓</div>
+        <div class="tf-block-wrap"><div class="tf-block-lbl">ffn</div><div class="tf-node ffn-node" onclick="showTFInfo(6)" id="tfn6">Feed-Forward Network (MLP)</div></div>
+        <div class="tf-arr">↓</div>
+        <div class="tf-block-wrap"><div class="tf-block-lbl">×N</div><div class="tf-node ffn-node" onclick="showTFInfo(7)" id="tfn7">Repeat × N Transformer Blocks</div></div>
+        <div class="tf-arr">↓</div>
+        <div class="tf-block-wrap"><div class="tf-block-lbl">out</div><div class="tf-node" onclick="showTFInfo(8)" id="tfn8">LayerNorm → Logits → Softmax</div></div>
+      </div>
+      <div class="tf-info-box" id="tf-info-box">
+        <strong>Select a block</strong>
+        Click any block on the left to see a detailed explanation of what that component does, including the math behind it.
+      </div>
+    </div>
+  </div>
+
+  <div class="demo-card">
+    <div class="demo-card-title">Causal Attention Matrix — type a sentence</div>
+    <p style="font-size:12px;color:var(--muted);font-family:var(--mono);margin-bottom:12px;line-height:1.7;">This shows a simulated attention weight matrix. Each cell [i,j] shows how much token i attends to token j. The upper triangle is masked to –∞ (causal: no token can see the future). Darker = higher attention weight.</p>
+    <input type="text" id="tf-text" value="the cat sat on the mat" oninput="drawAttention()" style="margin-bottom:14px;">
+    <canvas id="attn-canvas"></canvas>
+  </div>
+</div>
+
+<!-- ===== PLACEMENT ===== -->
+<div class="panel active" id="panel-placement">
+  <div class="sec-header">
+    <span class="sec-num">01 /</span>
+    <div>
+      <div class="sec-title">Placement Prediction</div>
+      <div class="sec-sub">Logistic Regression trained on 10,000 student records. The model weights below are approximated from your README's feature importance analysis. Enter a student profile to get a prediction and see which features drove it.</div>
+    </div>
+  </div>
+  <div class="metrics">
+    <div class="metric"><div class="metric-val">80.8%</div><div class="metric-lbl">Test Accuracy</div></div>
+    <div class="metric"><div class="metric-val">10,000</div><div class="metric-lbl">Training Rows</div></div>
+    <div class="metric"><div class="metric-val">12</div><div class="metric-lbl">Features</div></div>
+    <div class="metric"><div class="metric-val">80/20</div><div class="metric-lbl">Train/Test Split</div></div>
+  </div>
+
+  <div class="demo-card">
+    <div class="demo-card-title">Student Profile → Placement Prediction</div>
+    <div class="pl-grid">
+      <div><label>CGPA (0–10)</label><input type="number" id="pl-cgpa" value="7.5" min="0" max="10" step="0.1" oninput="predictPlacement()"></div>
+      <div><label>Aptitude Test Score (0–100)</label><input type="number" id="pl-apt" value="70" min="0" max="100" oninput="predictPlacement()"></div>
+      <div><label>Soft Skills Rating (1–5)</label><input type="number" id="pl-soft" value="3" min="1" max="5" step="0.5" oninput="predictPlacement()"></div>
+      <div><label>Internships</label><input type="number" id="pl-intern" value="1" min="0" max="5" oninput="predictPlacement()"></div>
+      <div><label>Projects</label><input type="number" id="pl-proj" value="2" min="0" max="10" oninput="predictPlacement()"></div>
+      <div><label>SSC Marks (%)</label><input type="number" id="pl-ssc" value="75" min="0" max="100" oninput="predictPlacement()"></div>
+      <div><label>Placement Training</label><select id="pl-train" onchange="predictPlacement()"><option value="1">Yes</option><option value="0">No</option></select></div>
+      <div><label>Extracurricular Activities</label><select id="pl-extra" onchange="predictPlacement()"><option value="1">Yes</option><option value="0">No</option></select></div>
+    </div>
+    <div id="pl-result"></div>
+    <div class="feature-bars" id="feat-bars"></div>
+  </div>
+</div>
+
+<!-- ===== SLEEP ===== -->
+<div class="panel" id="panel-sleep">
+  <div class="sec-header">
+    <span class="sec-num">02 /</span>
+    <div>
+      <div class="sec-title">Sleep & Academic Performance</div>
+      <div class="sec-sub">Linear Regression on a survey dataset. Key finding: daytime consequences of poor sleep (fatigue, missed classes, stress) are stronger predictors than sleep duration alone. Adjust the sliders to see the model's prediction and which drivers are dominant.</div>
+    </div>
+  </div>
+  <div class="metrics">
+    <div class="metric"><div class="metric-val">0.334</div><div class="metric-lbl">R² Score</div></div>
+    <div class="metric"><div class="metric-val">0.529</div><div class="metric-lbl">MAE</div></div>
+    <div class="metric"><div class="metric-val">Survey</div><div class="metric-lbl">Data Type</div></div>
+    <div class="metric"><div class="metric-val">Linear Reg</div><div class="metric-lbl">Model</div></div>
+  </div>
+
+  <div class="demo-card">
+    <div class="demo-card-title">Predict Academic Performance from Sleep Habits</div>
+    <div class="sl-grid">
+      <div class="sl-group"><label>Sleep Hours / Night <span id="sl-sv">7</span>h</label><input type="range" min="3" max="10" step="0.5" value="7" id="sl-sleep" oninput="updateSleep()"></div>
+      <div class="sl-group"><label>Stress Level <span id="sl-stv">3</span> / 5</label><input type="range" min="1" max="5" value="3" id="sl-stress" oninput="updateSleep()"></div>
+      <div class="sl-group"><label>Daytime Fatigue <span id="sl-fv">2</span> / 5</label><input type="range" min="1" max="5" value="2" id="sl-fatigue" oninput="updateSleep()"></div>
+      <div class="sl-group"><label>Missed Classes / Week <span id="sl-mv">1</span></label><input type="range" min="0" max="5" value="1" id="sl-miss" oninput="updateSleep()"></div>
+      <div class="sl-group"><label>Caffeine Cups / Day <span id="sl-cv">2</span></label><input type="range" min="0" max="6" value="2" id="sl-caff" oninput="updateSleep()"></div>
+      <div class="sl-group"><label>Late-Night Screen Time <span id="sl-scv">1</span>h</label><input type="range" min="0" max="4" step="0.5" value="1" id="sl-screen" oninput="updateSleep()"></div>
+    </div>
+    <div class="sl-result">
+      <div class="sl-score-big" id="sl-score">7.2</div>
+      <div class="sl-score-detail">
+        <div class="sl-score-lbl">Predicted Performance Score (1–10)</div>
+        <div class="sl-insight" id="sl-insight">—</div>
+        <div class="sl-drivers" id="sl-drivers"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== WIFI ===== -->
+<div class="panel" id="panel-wifi">
+  <div class="sec-header">
+    <span class="sec-num">03 /</span>
+    <div>
+      <div class="sec-title">Hostel Wi-Fi Performance</div>
+      <div class="sec-sub">Random Forest regression on hostel internet session logs. Since no direct speed/latency column exists, a proxy metric is engineered: <em>transfer_rate = total_transfer / usage_seconds</em>. Feature engineering includes cyclic time encoding, log-scaled transfers, and behavioral ratios.</div>
+    </div>
+  </div>
+  <div class="metrics">
+    <div class="metric"><div class="metric-val">0.759</div><div class="metric-lbl">R² Score</div></div>
+    <div class="metric"><div class="metric-val">508 KB/s</div><div class="metric-lbl">MAE</div></div>
+    <div class="metric"><div class="metric-val">Chrono.</div><div class="metric-lbl">Train/Test Split</div></div>
+    <div class="metric"><div class="metric-val">Rand Forest</div><div class="metric-lbl">Model</div></div>
+  </div>
+
+  <div class="demo-card">
+    <div class="demo-card-title">Predicted Session Transfer Rate by Hour</div>
+    <div class="wifi-note">
+      The model predicts <strong>session-level throughput (KB/s)</strong> — a proxy for network health. Low rate during peak hours (18–22h) = congestion. Low rate during off-peak (1–6h) = idle background sessions, not congestion. These mean different things.
+    </div>
+    <div class="wifi-controls">
+      <div>
+        <label>Hour of Day — <strong id="hour-lbl" style="color:var(--ink)">20:00</strong></label>
+        <input type="range" min="0" max="23" value="20" id="hour-slider" oninput="updateWifi()">
+      </div>
+      <div>
+        <label>Session Type</label>
+        <select id="wifi-type" onchange="updateWifi()">
+          <option value="streaming">Streaming / Download-heavy</option>
+          <option value="browsing">Casual Browsing</option>
+          <option value="upload">Upload / Assignment</option>
+          <option value="idle">Idle / Background</option>
+        </select>
+      </div>
+    </div>
+    <div class="wifi-metrics">
+      <div class="wifi-metric"><div class="wifi-metric-val" id="wf-rate">—</div><div class="wifi-metric-lbl">Predicted Rate (KB/s)</div></div>
+      <div class="wifi-metric"><div class="wifi-metric-val" id="wf-load">—</div><div class="wifi-metric-lbl">Network Load</div></div>
+      <div class="wifi-metric"><div class="wifi-metric-val" id="wf-rec">—</div><div class="wifi-metric-lbl">Recommendation</div></div>
+      <div class="wifi-metric"><div class="wifi-metric-val" id="wf-type2">—</div><div class="wifi-metric-lbl">Interpretation</div></div>
+    </div>
+    <canvas id="wifi-chart" height="140"></canvas>
+  </div>
+</div>
+
+</div><!-- /page-body -->
+
+<script>
+// ===== NAV =====
+function switchTab(id, el) {
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.index-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  el.classList.add('active');
+  if(id==='transformer'){ setTimeout(drawAttention,50); }
+  if(id==='wifi'){ setTimeout(()=>{updateWifi();},50); }
+  if(id==='sleep'){ updateSleep(); }
+  if(id==='micrograd'){ updateGraph(); initXOR(); }
+  if(id==='placement'){ predictPlacement(); }
+}
+
+// ===== MNIST =====
+const canvas = document.getElementById('draw-canvas');
+const ctx = canvas.getContext('2d');
+let isDrawing = false;
+let skipAnim = false;
+ctx.fillStyle='#000'; ctx.fillRect(0,0,280,280);
+ctx.strokeStyle='#fff'; ctx.lineWidth=20; ctx.lineCap='round'; ctx.lineJoin='round';
+
+function getXY(e) {
+  const r=canvas.getBoundingClientRect();
+  const sx=canvas.width/r.width, sy=canvas.height/r.height;
+  if(e.touches) return {x:(e.touches[0].clientX-r.left)*sx,y:(e.touches[0].clientY-r.top)*sy};
+  return {x:(e.clientX-r.left)*sx,y:(e.clientY-r.top)*sy};
+}
+canvas.addEventListener('mousedown',e=>{isDrawing=true;ctx.beginPath();const p=getXY(e);ctx.moveTo(p.x,p.y);});
+canvas.addEventListener('mousemove',e=>{if(!isDrawing)return;const p=getXY(e);ctx.lineTo(p.x,p.y);ctx.stroke();});
+canvas.addEventListener('mouseup',()=>isDrawing=false);
+canvas.addEventListener('mouseleave',()=>isDrawing=false);
+canvas.addEventListener('touchstart',e=>{e.preventDefault();isDrawing=true;ctx.beginPath();const p=getXY(e);ctx.moveTo(p.x,p.y);},{passive:false});
+canvas.addEventListener('touchmove',e=>{e.preventDefault();if(!isDrawing)return;const p=getXY(e);ctx.lineTo(p.x,p.y);ctx.stroke();},{passive:false});
+canvas.addEventListener('touchend',()=>isDrawing=false);
+
+function clearCanvas(){
+  ctx.fillStyle='#000';ctx.fillRect(0,0,280,280);
+  document.getElementById('pred-display').style.display='none';
+  document.getElementById('viz-steps').style.display='none';
+  document.getElementById('idle-msg').style.display='block';
+}
+function skipAnimation(){ skipAnim=true; }
+
+// ── Real weights from your trained PyTorch model ──────────────────────────
+// Loaded from mnist_weights.json (must be in same folder as this HTML)
+let mlpWeights = null;
+let weightsLoading = false;
+let weightsError = false;
+
+async function ensureWeights() {
+  if (mlpWeights) return true;
+  if (weightsError) return false;
+  if (weightsLoading) {
+    // Wait for ongoing load
+    while (weightsLoading) await new Promise(r=>setTimeout(r,50));
+    return !!mlpWeights;
+  }
+  weightsLoading = true;
+  document.getElementById('idle-msg').textContent = 'Loading trained weights...';
+  try {
+    const res = await fetch('mnist_weights.json');
+    if (!res.ok) throw new Error('not found');
+    const raw = await res.json();
+    // raw keys: fc1_weight, fc1_bias, fc2_weight, fc2_bias  (your export format)
+    mlpWeights = {
+      fc1w: raw.fc1_weight,  // [128][784]
+      fc1b: raw.fc1_bias,    // [128]
+      fc2w: raw.fc2_weight,  // [10][128]
+      fc2b: raw.fc2_bias,    // [10]
+    };
+    weightsLoading = false;
+    document.getElementById('idle-msg').textContent = 'Weights loaded ✓ — draw a digit and press Run →';
+    return true;
+  } catch(e) {
+    weightsLoading = false;
+    weightsError = true;
+    document.getElementById('idle-msg').innerHTML =
+      '⚠ <strong>mnist_weights.json not found.</strong><br>Place it in the same folder as this HTML file, then reload.';
+    return false;
+  }
+}
+
+function relu(x){return x>0?x:0;}
+function softmax(arr){const m=Math.max(...arr);const e=arr.map(x=>Math.exp(x-m));const s=e.reduce((a,b)=>a+b,0);return e.map(x=>x/s);}
+
+function mlpForward(input) {
+  // Exact same forward pass as your PyTorch NeuralNet:
+  //   x = fc1(x)  →  relu  →  fc2(x)
+  // Your training normalization: Normalize((0.5,),(0.5,))  =>  x*2 - 1
+  const h = new Float32Array(128);
+  for(let j=0;j<128;j++){
+    let sum = mlpWeights.fc1b[j];
+    const row = mlpWeights.fc1w[j];
+    for(let i=0;i<784;i++) sum += row[i]*input[i];
+    h[j] = relu(sum);
+  }
+  const logits = new Float32Array(10);
+  for(let k=0;k<10;k++){
+    let sum = mlpWeights.fc2b[k];
+    const row = mlpWeights.fc2w[k];
+    for(let j=0;j<128;j++) sum += row[j]*h[j];
+    logits[k] = sum;
+  }
+  return {h, probs: softmax(Array.from(logits)), logits: Array.from(logits)};
+}
+
+function getPixels() {
+  // Downsample 280×280 canvas → 28×28, then apply your normalization:
+  // transforms.ToTensor() converts [0,255] → [0,1]
+  // transforms.Normalize((0.5,),(0.5,)) converts [0,1] → [-1,1]
+  // Combined: pixel_norm = (raw/255 - 0.5) / 0.5  =  raw/255 * 2 - 1
+  const imgData = ctx.getImageData(0,0,280,280).data;
+  const px = new Float32Array(784);
+  for(let r=0;r<28;r++) for(let c=0;c<28;c++){
+    let s=0;
+    for(let dr=0;dr<10;dr++) for(let dc=0;dc<10;dc++){
+      const idx=((r*10+dr)*280+(c*10+dc))*4;
+      s+=imgData[idx]; // R channel (grayscale white stroke)
+    }
+    const rawMean = s / 100;           // average over 10×10 block, [0,255]
+    px[r*28+c] = rawMean/255*2 - 1;   // your exact normalization → [-1,1]
+  }
+  return px;
+}
+
+async function runInference(){
+  const ok = await ensureWeights();
+  if (!ok) return;
+  skipAnim=false;
+  document.getElementById('idle-msg').style.display='none';
+  const px = getPixels();
+  const {h, probs} = mlpForward(px);
+
+  // Show pixel grid
+  const pxCanvas = document.getElementById('pixel-canvas');
+  const pxCtx = pxCanvas.getContext('2d');
+  const imgData2 = pxCtx.createImageData(28,28);
+  for(let i=0;i<784;i++){
+    const v = Math.round(Math.min(255,Math.max(0,(px[i]*0.3081+0.1307)*255)));
+    imgData2.data[i*4]=v; imgData2.data[i*4+1]=v; imgData2.data[i*4+2]=v; imgData2.data[i*4+3]=255;
+  }
+  pxCtx.putImageData(imgData2,0,0);
+  document.getElementById('viz-steps').style.display='flex';
+
+  // Animate NN viz
+  await animateNN(px, h, probs);
+
+  // Show prediction
+  const pred = probs.indexOf(Math.max(...probs));
+  document.getElementById('pred-digit-big').textContent = pred;
+  document.getElementById('pred-display').style.display='flex';
+  renderProbBars(probs, pred);
+}
+
+async function animateNN(px, h, probs) {
+  const vizCanvas = document.getElementById('nn-viz');
+  const W = vizCanvas.offsetWidth || 400;
+  vizCanvas.width = W;
+  const vc = vizCanvas.getContext('2d');
+  const H = 220;
+  vc.clearRect(0,0,W,H);
+  vc.fillStyle='#fff'; vc.fillRect(0,0,W,H);
+
+  // Sample neurons to show: 16 input, 16 hidden, 10 output
+  const inputSample = Array.from({length:16},(_,i)=>Math.floor(i*784/16));
+  const hiddenSample = Array.from({length:16},(_,i)=>Math.floor(i*128/16));
+
+  const layers = [
+    {neurons: inputSample.map(i=>({v:px[i]*0.3081+0.1307,lbl:i})), label:'Input (16/784)', x:0.08},
+    {neurons: hiddenSample.map(i=>({v:h[i]/Math.max(...Array.from(h))||0,lbl:i})), label:'Hidden (16/128)', x:0.5},
+    {neurons: probs.map((v,i)=>({v,lbl:i})), label:'Output (10)', x:0.88},
+  ];
+
+  const r = 7;
+  const layerX = layers.map(l=>l.x*W);
+
+  function drawState(progress) {
+    vc.clearRect(0,0,W,H);
+    vc.fillStyle='#fff'; vc.fillRect(0,0,W,H);
+
+    // Draw connections (sampled)
+    if(progress > 0.3) {
+      const alpha = Math.min(1,(progress-0.3)/0.4);
+      for(let a=0;a<layers[0].neurons.length;a+=2){
+        for(let b=0;b<layers[1].neurons.length;b+=2){
+          const y0=getY(a,layers[0].neurons.length,H);
+          const y1=getY(b,layers[1].neurons.length,H);
+          vc.strokeStyle=`rgba(26,58,107,${0.06*alpha})`;
+          vc.lineWidth=1;
+          vc.beginPath();vc.moveTo(layerX[0],y0);vc.lineTo(layerX[1],y1);vc.stroke();
+        }
+      }
+    }
+    if(progress > 0.6) {
+      const alpha = Math.min(1,(progress-0.6)/0.3);
+      for(let a=0;a<layers[1].neurons.length;a+=2){
+        for(let b=0;b<layers[2].neurons.length;b++){
+          const y0=getY(a,layers[1].neurons.length,H);
+          const y1=getY(b,layers[2].neurons.length,H);
+          vc.strokeStyle=`rgba(26,58,107,${0.08*alpha})`;
+          vc.lineWidth=1;
+          vc.beginPath();vc.moveTo(layerX[1],y0);vc.lineTo(layerX[2],y1);vc.stroke();
+        }
+      }
+    }
+
+    // Draw neurons
+    layers.forEach((layer,li)=>{
+      const showProgress = li===0?1:li===1?Math.min(1,progress/0.5):Math.min(1,(progress-0.5)/0.5);
+      layer.neurons.forEach((n,ni)=>{
+        if(ni/layer.neurons.length > showProgress) return;
+        const y=getY(ni,layer.neurons.length,H);
+        const intensity = Math.max(0,Math.min(1,n.v));
+        if(li===2 && n.lbl===probs.indexOf(Math.max(...probs))){
+          vc.fillStyle=`rgba(26,92,58,${0.15+intensity*0.85})`;
+          vc.strokeStyle='rgb(26,92,58)';
+        } else {
+          vc.fillStyle=`rgba(26,58,107,${0.08+intensity*0.85})`;
+          vc.strokeStyle=`rgba(26,58,107,${0.3+intensity*0.7})`;
+        }
+        vc.lineWidth=1;
+        vc.beginPath();vc.arc(layerX[li],y,r,0,Math.PI*2);vc.fill();vc.stroke();
+        if(li===2){
+          vc.fillStyle='#666';vc.font='9px IBM Plex Mono';vc.textAlign='left';
+          vc.fillText(n.lbl,layerX[li]+r+3,y+3);
+        }
+      });
+      // layer label
+      vc.fillStyle='#aaa'; vc.font='9px IBM Plex Mono'; vc.textAlign='center';
+      vc.fillText(layer.label,layerX[li],H-4);
+    });
+  }
+
+  function getY(i,total,H){return 20+(H-40)*((i+0.5)/total);}
+
+  if(skipAnim){ drawState(1); return; }
+  const start=performance.now();
+  const dur=1200;
+  await new Promise(res=>{
+    function frame(now){
+      const t=Math.min(1,(now-start)/dur);
+      drawState(t);
+      if(t<1) requestAnimationFrame(frame); else res();
+    }
+    requestAnimationFrame(frame);
+  });
+}
+
+function renderProbBars(probs, pred) {
+  const el = document.getElementById('prob-bars');
+  el.innerHTML = probs.map((p,i)=>`
+    <div class="prob-row">
+      <span class="prob-d">${i}</span>
+      <div class="prob-bar-bg"><div class="prob-bar-fg${i===pred?' top':''}" style="width:${(p*100).toFixed(1)}%"></div></div>
+      <span class="prob-pct">${(p*100).toFixed(1)}%</span>
+    </div>`).join('');
+}
+
+// ===== MICROGRAD =====
+function updateGraph(){
+  const a=parseFloat(document.getElementById('mg-a').value)||0;
+  const b=parseFloat(document.getElementById('mg-b').value)||0;
+  const c=parseFloat(document.getElementById('mg-c').value)||0;
+  const ab=a*b, d=ab+c, e=Math.tanh(d);
+  const de=1, dd=(1-e*e)*de, dab=dd, dc=dd, da=b*dab, db=a*dab;
+
+  document.getElementById('comp-graph').innerHTML = `
+    <div class="node-row">
+      <div class="g-node leaf">a = ${a.toFixed(2)}<div class="g-grad">∂e/∂a = ${da.toFixed(4)}</div></div>
+      <span class="g-arrow">×</span>
+      <div class="g-node leaf">b = ${b.toFixed(2)}<div class="g-grad">∂e/∂b = ${db.toFixed(4)}</div></div>
+      <span class="g-arrow">→</span>
+      <div class="g-node op">a×b = ${ab.toFixed(4)}<div class="g-grad">grad = ${dab.toFixed(4)}</div></div>
+      <span class="g-arrow">+</span>
+      <div class="g-node leaf">c = ${c.toFixed(2)}<div class="g-grad">∂e/∂c = ${dc.toFixed(4)}</div></div>
+      <span class="g-arrow">→</span>
+      <div class="g-node op">d = ${d.toFixed(4)}<div class="g-grad">grad = ${dd.toFixed(4)}</div></div>
+      <span class="g-arrow">→</span>
+      <div class="g-node result">e = tanh(d) = ${e.toFixed(6)}<div class="g-grad">grad = 1.0 (output)</div></div>
+    </div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:8px;">
+      Backward: de/de=1 → de/dd=(1−tanh²d)·1=${dd.toFixed(4)} → de/da=b·${dd.toFixed(4)}=${da.toFixed(4)}, de/db=a·${dd.toFixed(4)}=${db.toFixed(4)}, de/dc=${dc.toFixed(4)}
+    </div>`;
+}
+
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};}
+
+// XOR — proper JS neural net (matching your micrograd architecture)
+let xorNet = null, xorLosses = [], xorRunning = false;
+
+function randn(){ const u=Math.random(),v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); }
+function tanhF(x){ return Math.tanh(x); }
+function tanhD(x){ const t=Math.tanh(x);return 1-t*t; }
+
+class Scalar {
+  constructor(v,parents=[]){this.v=v;this.g=0;this._parents=parents;this._back=()=>{};}
+  add(o){const out=new Scalar(this.v+o.v,[this,o]);out._back=()=>{this.g+=out.g;o.g+=out.g;};return out;}
+  mul(o){const out=new Scalar(this.v*o.v,[this,o]);out._back=()=>{this.g+=o.v*out.g;o.g+=this.v*out.g;};return out;}
+  tanh(){const t=Math.tanh(this.v);const out=new Scalar(t,[this]);out._back=()=>{this.g+=(1-t*t)*out.g;};return out;}
+  pow(p){const out=new Scalar(this.v**p,[this]);out._back=()=>{this.g+=p*this.v**(p-1)*out.g;};return out;}
+  sub(o){return this.add(o.mul(new Scalar(-1)));}
+  backward(){
+    const topo=[]; const vis=new Set();
+    const build=n=>{if(!vis.has(n)){vis.add(n);n._parents.forEach(build);topo.push(n);}};
+    build(this);this.g=1;
+    for(let i=topo.length-1;i>=0;i--) topo[i]._back();
+  }
+}
+
+function buildXORNet(seed=1){
+  const rng=mulberry32(seed);
+  const P=(rows,cols)=>Array.from({length:rows},()=>Array.from({length:cols},()=>new Scalar((rng()-0.5)*1.5)));
+  const B=n=>Array.from({length:n},()=>new Scalar(0));
+  return {
+    l1w:P(4,2),l1b:B(4),
+    l2w:P(4,4),l2b:B(4),
+    l3w:P(1,4),l3b:B(1),
+    params(){return [...this.l1w.flat(),...this.l1b,...this.l2w.flat(),...this.l2b,...this.l3w.flat(),...this.l3b];}
+  };
+}
+
+function xorForward(net,[x0,x1]){
+  const x=[new Scalar(x0),new Scalar(x1)];
+  const layer=(w,b,inp,act)=>w.map((row,j)=>{
+    let s=b[j];
+    row.forEach((wij,i)=>{s=s.add(wij.mul(inp[i]));});
+    return act?s.tanh():s;
+  });
+  const h1=layer(net.l1w,net.l1b,x,true);
+  const h2=layer(net.l2w,net.l2b,h1,true);
+  return layer(net.l3w,net.l3b,h2,false)[0];
+}
+
+function initXOR(){ xorNet=buildXORNet(1); xorLosses=[]; drawXORBoundary(false); drawLossCurve(); }
+
+async function trainXOR(){
+  if(xorRunning)return;
+  xorRunning=true;
+  xorNet=buildXORNet(1);
+  xorLosses=[];
+  const log=document.getElementById('training-log');
+  log.innerHTML='';
+  const X=[[0,0],[0,1],[1,0],[1,1]], Y=[-1,1,1,-1];
+  const lr=0.08, steps=500;
+
+  for(let s=0;s<steps;s++){
+    const ps=xorNet.params(); ps.forEach(p=>p.g=0);
+    let loss=new Scalar(0);
+    X.forEach((x,i)=>{
+      const pred=xorForward(xorNet,x);
+      const diff=pred.sub(new Scalar(Y[i]));
+      loss=loss.add(diff.pow(2));
+    });
+    loss=loss.mul(new Scalar(0.25));
+    loss.backward();
+    ps.forEach(p=>{p.v-=lr*p.g;});
+    xorLosses.push(loss.v);
+
+    if(s%50===0||s===steps-1){
+      await new Promise(r=>setTimeout(r,0));
+      const l=document.createElement('div');
+      l.className='log-l';
+      l.innerHTML=`<span class="log-s">step ${String(s).padStart(3,'0')}</span>  loss = ${loss.v.toFixed(6)}`;
+      log.appendChild(l); log.scrollTop=log.scrollHeight;
+      drawLossCurve();
+      if(s===steps-1) drawXORBoundary(true);
+    }
+    if(s%100===0) { drawXORBoundary(false); await new Promise(r=>setTimeout(r,10)); }
+  }
+  xorRunning=false;
+}
+
+function drawXORBoundary(final){
+  const c=document.getElementById('xor-canvas');
+  const x=c.getContext('2d');
+  const W=c.width,H=c.height;
+  x.clearRect(0,0,W,H);
+  const res=40;
+  for(let pi=0;pi<res;pi++) for(let pj=0;pj<res;pj++){
+    const ix=pj/res, iy=pi/res;
+    if(!xorNet){x.fillStyle='#eee';x.fillRect(pj*W/res,pi*H/res,W/res,H/res);continue;}
+    const out=xorForward(xorNet,[ix*2-0.5,iy*2-0.5]).v;
+    const t=Math.max(-1,Math.min(1,out));
+    if(t>0) x.fillStyle=`rgba(26,58,107,${Math.abs(t)*0.7})`;
+    else x.fillStyle=`rgba(192,57,43,${Math.abs(t)*0.7})`;
+    x.fillRect(pj*W/res,pi*H/res,W/res+1,H/res+1);
+  }
+  // XOR points
+  const pts=[[0,0,-1],[1,0,1],[0,1,1],[1,1,-1]];
+  pts.forEach(([px2,py2,cls])=>{
+    const sx=(px2*0.6+0.2)*W, sy=(py2*0.6+0.2)*H;
+    x.beginPath();x.arc(sx,sy,10,0,Math.PI*2);
+    x.fillStyle=cls>0?'rgb(26,92,58)':'rgb(192,57,43)';
+    x.fill(); x.strokeStyle='#fff'; x.lineWidth=2; x.stroke();
+    x.fillStyle='#fff'; x.font='bold 11px IBM Plex Mono'; x.textAlign='center'; x.textBaseline='middle';
+    x.fillText(cls>0?'+1':'−1',sx,sy);
+  });
+  if(!final&&!xorNet){
+    x.fillStyle='rgba(180,180,180,0.9)'; x.fillRect(0,0,W,H);
+    x.fillStyle='#888'; x.font='12px IBM Plex Mono'; x.textAlign='center'; x.textBaseline='middle';
+    x.fillText('Press Train to see the learned boundary',W/2,H/2);
+  }
+}
+
+function drawLossCurve(){
+  const c=document.getElementById('loss-canvas');
+  const W=c.offsetWidth||400; c.width=W;
+  const H=c.height||160;
+  const x=c.getContext('2d');
+  x.clearRect(0,0,W,H); x.fillStyle='#fff'; x.fillRect(0,0,W,H);
+  if(xorLosses.length<2) return;
+  const max=Math.max(...xorLosses);
+  const pad={l:36,r:10,t:10,b:28};
+  const iW=W-pad.l-pad.r, iH=H-pad.t-pad.b;
+  x.strokeStyle='#ddd'; x.lineWidth=1;
+  [0,0.25,0.5,0.75,1].forEach(f=>{
+    const y=pad.t+iH*(1-f);
+    x.beginPath();x.moveTo(pad.l,y);x.lineTo(W-pad.r,y);x.stroke();
+    x.fillStyle='#aaa'; x.font='9px IBM Plex Mono'; x.textAlign='right';
+    x.fillText((max*f).toFixed(2),pad.l-4,y+3);
+  });
+  x.strokeStyle='#1a3a6b'; x.lineWidth=2; x.beginPath();
+  xorLosses.forEach((l,i)=>{
+    const px2=pad.l+iW*i/(xorLosses.length-1||1);
+    const py=pad.t+iH*(1-l/max);
+    i===0?x.moveTo(px2,py):x.lineTo(px2,py);
+  });
+  x.stroke();
+  x.fillStyle='#aaa'; x.font='9px IBM Plex Mono'; x.textAlign='center';
+  x.fillText('Training Steps',pad.l+iW/2,H-6);
+}
+
+function resetXOR(){ xorNet=null; xorLosses=[]; drawXORBoundary(false); drawLossCurve(); document.getElementById('training-log').innerHTML=''; }
+
+// ===== TRANSFORMER =====
+const tfInfos = [
+  {title:'Input Text → Token IDs', color:'var(--ink)', body:`Text is split into sub-word tokens using Byte Pair Encoding (BPE). Each token maps to an integer ID from a vocabulary of ~50,257 tokens. For example: "the cat" → [262, 3797].`, math:`token_ids = tokenizer.encode(text)  # list of int`},
+  {title:'Token + Positional Embedding', color:'#8b6914', body:`Two learned lookup tables: one for token identity (W_E of shape 50257×768), one for position (W_pos of shape 1024×768). They are added element-wise. This gives the model both <em>what</em> the token is and <em>where</em> it is.`, math:`X_i = W_E[token_id] + W_pos[position_i]  # shape: (T, 768)`},
+  {title:'Pre-LayerNorm', color:'var(--ink)', body:`Normalize the input to have mean≈0 and variance≈1 across the feature dimension. GPT-2 applies this <em>before</em> each sub-layer (Pre-LN), which stabilizes training compared to Post-LN.`, math:`LayerNorm(x) = γ · (x − μ) / σ + β`},
+  {title:'Masked Multi-Head Self-Attention', color:'#1a3a6b', body:`Each token computes Q, K, V projections. The attention score between token i and j is QᵢKⱼᵀ/√d_head. The upper triangle (j > i) is masked to −∞ so no token can attend to future tokens. After softmax, each token collects a weighted sum of V vectors. 12 heads run in parallel then concatenate.`, math:`scores = QKᵀ / √64\nmask: scores[i,j] = -∞ if j > i\nA = softmax(scores)\nout = A @ V`},
+  {title:'Residual Addition ⊕', color:'var(--ink)', body:`The output of the attention sub-layer is added back to the input: X = X + Attn(X). Residual connections let gradients flow directly through to earlier layers, preventing vanishing gradients in deep networks.`, math:`X = X + MultiHeadAttn(LayerNorm(X))`},
+  {title:'Pre-LayerNorm (2nd)', color:'var(--ink)', body:`Second normalization, applied before the feed-forward network in each Transformer block.`, math:`X_normed = LayerNorm(X)`},
+  {title:'Feed-Forward Network (MLP)', color:'#1a5c3a', body:`A 2-layer MLP applied independently to each token position. Expands to 4× the model dimension (768→3072), applies GeLU activation, then projects back (3072→768). This is where most of the model's "knowledge" is thought to be stored.`, math:`H = GeLU(X @ W₁ + b₁)  # (T, 3072)\nout = H @ W₂ + b₂         # (T, 768)`},
+  {title:'Repeat × N Blocks', color:'#1a5c3a', body:`GPT-2 small has 12 identical Transformer blocks. Each block refines the token representations. Deeper layers tend to encode more abstract, semantic information; earlier layers capture syntax and local patterns.`, math:`for i in range(12):\n  X = transformer_block(X)`},
+  {title:'LayerNorm → Logits → Softmax', color:'var(--ink)', body:`Final LayerNorm, then the unembedding matrix (same weights as W_E, tied) projects (T,768) → (T,50257). Only the last position's logits matter for generation. Softmax gives a probability distribution; sample or argmax to get the next token.`, math:`logits = X @ W_E.T         # (T, 50257)\np = softmax(logits[-1])    # next-token probs`},
+];
+
+let activeTFNode = -1;
+function showTFInfo(i) {
+  document.querySelectorAll('.tf-node').forEach((n,j)=>{ n.classList.remove('active-node'); });
+  document.getElementById('tfn'+i).classList.add('active-node');
+  activeTFNode=i;
+  const info=tfInfos[i];
+  document.getElementById('tf-info-box').innerHTML=`<strong>${info.title}</strong>${info.body}<div class="tf-info-math">${info.math.replace(/\n/g,'<br>')}</div>`;
+}
+
+function drawAttention(){
+  const text=document.getElementById('tf-text')?.value||'the cat sat';
+  const tokens=text.trim().split(/\s+/).filter(t=>t.length>0);
+  const n=Math.min(tokens.length,10);
+  if(n<1)return;
+  const c=document.getElementById('attn-canvas');
+  const availW=c.parentElement.offsetWidth||500;
+  const cell=Math.min(Math.floor(availW/(n+1.2)),54);
+  c.width=(n+1)*cell+cell/2; c.height=(n+1)*cell+10;
+  const x=c.getContext('2d');
+  x.clearRect(0,0,c.width,c.height);
+  x.fillStyle='#fff'; x.fillRect(0,0,c.width,c.height);
+
+  // Generate causal attention
+  const attn=[];
+  for(let i=0;i<n;i++){
+    const row=new Array(n).fill(0);
+    let sum=0;
+    for(let j=0;j<=i;j++){const v=Math.exp(-(i-j)*0.5)*(0.6+Math.random()*0.8);row[j]=v;sum+=v;}
+    for(let j=0;j<=i;j++) row[j]/=sum;
+    attn.push(row);
+  }
+  const off=cell;
+  x.font=`${Math.max(9,cell/3.8)}px IBM Plex Mono`;
+  x.textAlign='center'; x.textBaseline='middle';
+  tokens.slice(0,n).forEach((t,j)=>{
+    x.fillStyle='#333'; x.fillText(t.slice(0,7),off+j*cell+cell/2,cell/2);
+  });
+  tokens.slice(0,n).forEach((t,i)=>{
+    x.fillStyle='#333'; x.fillText(t.slice(0,7),cell/2,off+i*cell+cell/2);
+  });
+  for(let i=0;i<n;i++) for(let j=0;j<n;j++){
+    const cx=off+j*cell, cy=off+i*cell;
+    if(j>i){ x.fillStyle='#f0ede8'; x.fillRect(cx,cy,cell,cell); }
+    else {
+      const v=attn[i][j];
+      x.fillStyle=`rgba(26,58,107,${v*0.9+0.05})`; x.fillRect(cx,cy,cell,cell);
+      x.fillStyle=v>0.4?'#fff':'rgba(255,255,255,0.6)';
+      x.fillText((v*100).toFixed(0),cx+cell/2,cy+cell/2);
+    }
+    x.strokeStyle='#e8e4de'; x.lineWidth=0.5;
+    x.strokeRect(cx,cy,cell,cell);
+  }
+}
+setTimeout(drawAttention,200);
+
+// ===== PLACEMENT =====
+function predictPlacement(){
+  const cgpa=parseFloat(document.getElementById('pl-cgpa').value)||0;
+  const apt=parseFloat(document.getElementById('pl-apt').value)||0;
+  const soft=parseFloat(document.getElementById('pl-soft').value)||0;
+  const intern=parseFloat(document.getElementById('pl-intern').value)||0;
+  const proj=parseFloat(document.getElementById('pl-proj').value)||0;
+  const ssc=parseFloat(document.getElementById('pl-ssc').value)||0;
+  const train=parseInt(document.getElementById('pl-train').value);
+  const extra=parseInt(document.getElementById('pl-extra').value);
+
+  const coefs=[
+    {name:'Placement Training',val:train,w:1.45},
+    {name:'CGPA',val:cgpa,w:0.72},
+    {name:'Aptitude Score',val:apt/100*10,w:0.48},
+    {name:'Soft Skills',val:soft,w:0.60},
+    {name:'Internships',val:intern,w:0.55},
+    {name:'Extracurriculars',val:extra,w:0.70},
+    {name:'Projects',val:proj,w:0.28},
+    {name:'SSC Marks',val:ssc/100*10,w:0.22},
+  ];
+  const intercept=-8.5;
+  const score=intercept+coefs.reduce((s,c)=>s+c.w*c.val,0);
+  const prob=1/(1+Math.exp(-score));
+
+  const res=document.getElementById('pl-result');
+  res.className='pl-result '+(prob>=0.5?'placed':'not-placed');
+  res.style.display='block';
+  res.innerHTML=`<div class="pl-result-big">${prob>=0.5?'Placed':'Not Placed'}</div>
+    <div class="pl-result-sub">
+      Model score: ${score.toFixed(3)} &nbsp;|&nbsp; σ(score) = ${prob.toFixed(4)} &nbsp;|&nbsp; Confidence: ${(Math.max(prob,1-prob)*100).toFixed(1)}%
+    </div>`;
+
+  // Feature contribution bars
+  const maxContrib=Math.max(...coefs.map(c=>Math.abs(c.w*c.val)));
+  document.getElementById('feat-bars').innerHTML=`
+    <div style="font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin:16px 0 10px;">Feature Contributions</div>
+    ${coefs.map(c=>{
+      const contrib=c.w*c.val;
+      const pct=Math.abs(contrib)/maxContrib*100;
+      return`<div class="feat-row">
+        <div class="feat-lbl">${c.name}</div>
+        <div class="feat-bar-bg"><div class="feat-bar-fg${contrib<0?' neg':''}" style="width:${pct}%"></div></div>
+        <div class="feat-val">${contrib>=0?'+':''}${contrib.toFixed(2)}</div>
+      </div>`;
+    }).join('')}`;
+}
+
+// ===== SLEEP =====
+function updateSleep(){
+  const sleep=parseFloat(document.getElementById('sl-sleep').value);
+  const stress=parseFloat(document.getElementById('sl-stress').value);
+  const fat=parseFloat(document.getElementById('sl-fatigue').value);
+  const miss=parseFloat(document.getElementById('sl-miss').value);
+  const caff=parseFloat(document.getElementById('sl-caff').value);
+  const screen=parseFloat(document.getElementById('sl-screen').value);
+
+  document.getElementById('sl-sv').textContent=sleep;
+  document.getElementById('sl-stv').textContent=stress;
+  document.getElementById('sl-fv').textContent=fat;
+  document.getElementById('sl-mv').textContent=miss;
+  document.getElementById('sl-cv').textContent=caff;
+  document.getElementById('sl-scv').textContent=screen;
+
+  const drivers=[
+    {name:'Missed Classes',impact:-0.60*miss,mag:Math.abs(0.60*miss)},
+    {name:'Fatigue',impact:-0.50*fat,mag:Math.abs(0.50*fat)},
+    {name:'Stress',impact:-0.40*stress,mag:Math.abs(0.40*stress)},
+    {name:'Sleep Duration',impact:0.30*(sleep-7),mag:Math.abs(0.30*(sleep-7))},
+    {name:'Screen Time',impact:-0.20*screen,mag:Math.abs(0.20*screen)},
+    {name:'Caffeine',impact:-0.15*caff,mag:Math.abs(0.15*caff)},
+  ];
+  const score=Math.max(1,Math.min(10,8.2+drivers.reduce((s,d)=>s+d.impact,0)));
+  document.getElementById('sl-score').textContent=score.toFixed(1);
+
+  let insight='';
+  if(fat>=4) insight='Fatigue is the dominant negative predictor in this model. Improving sleep quality may reduce its impact more than extending duration.';
+  else if(miss>=3) insight='Missed classes have the strongest measurable negative effect — consistent attendance matters more than sleep duration alone.';
+  else if(stress>=4) insight='High stress reduces performance independently of sleep. The model captures this through the stress coefficient.';
+  else if(sleep>=8&&stress<=2) insight='Low stress and adequate sleep put you in the model\'s high-performance region. Maintain consistency.';
+  else insight='Profile is balanced. The key drivers are fatigue, missed classes, and stress — not sleep duration alone.';
+  document.getElementById('sl-insight').textContent=insight;
+
+  const maxMag=Math.max(...drivers.map(d=>d.mag),0.01);
+  document.getElementById('sl-drivers').innerHTML=drivers.map(d=>`
+    <div class="driver-row">
+      <div class="driver-lbl">${d.name}</div>
+      <div class="driver-bar-bg"><div class="driver-bar-fg" style="width:${d.mag/maxMag*100}%;background:${d.impact<0?'#c0392b':'#1a5c3a'}"></div></div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--muted);width:44px;text-align:right;">${d.impact>=0?'+':''}${d.impact.toFixed(2)}</div>
+    </div>`).join('');
+}
+
+// ===== WIFI =====
+const wifiBase={streaming:2800,browsing:1200,upload:900,idle:120};
+const peakFactor={streaming:0.48,browsing:0.36,upload:0.30,idle:0.12};
+
+function getPredRate(h,type){
+  const pf=peakFactor[type];
+  const peak=(h>=18&&h<=22)?pf:(h>=7&&h<=9)?pf*0.45:0;
+  const offpeak=(h>=1&&h<=6)?0.15:0;
+  return Math.round(wifiBase[type]*(1-peak)*(1+offpeak));
+}
+
+function updateWifi(){
+  const h=parseInt(document.getElementById('hour-slider').value);
+  const type=document.getElementById('wifi-type').value;
+  document.getElementById('hour-lbl').textContent=String(h).padStart(2,'0')+':00';
+  const rate=getPredRate(h,type);
+  const base=wifiBase[type];
+  const loadPct=Math.round((1-rate/base)*100);
+  const isPeak=h>=18&&h<=22;
+  const isOffpeak=h>=1&&h<=6;
+  const loadStr=loadPct>55?'High':loadPct>30?'Medium':'Low';
+  const loadColor=loadPct>55?'#c0392b':loadPct>30?'#8b6914':'#1a5c3a';
+  const rec=isPeak?'Avoid large transfers':isOffpeak?'Optimal window':'Acceptable';
+  const interp=isPeak?'Congestion':(isOffpeak&&type==='idle')?'Idle (not congestion)':'Normal load';
+  document.getElementById('wf-rate').textContent=rate.toLocaleString();
+  document.getElementById('wf-rate').style.color='#0f0f0f';
+  document.getElementById('wf-load').textContent=loadStr;
+  document.getElementById('wf-load').style.color=loadColor;
+  document.getElementById('wf-rec').textContent=rec;
+  document.getElementById('wf-type2').textContent=interp;
+  drawWifiChart(h,type);
+}
+
+function drawWifiChart(curH,type){
+  const c=document.getElementById('wifi-chart');
+  const W=c.parentElement.offsetWidth||600; c.width=W; c.height=140;
+  const ctx2=c.getContext('2d');
+  const H=140;
+  ctx2.clearRect(0,0,W,H); ctx2.fillStyle='#fff'; ctx2.fillRect(0,0,W,H);
+  const pad={l:48,r:12,t:12,b:28};
+  const iW=W-pad.l-pad.r, iH=H-pad.t-pad.b;
+  const rates=Array.from({length:24},(_,h)=>getPredRate(h,type));
+  const max=Math.max(...rates);
+
+  ctx2.strokeStyle='#eee'; ctx2.lineWidth=1;
+  [0,0.25,0.5,0.75,1].forEach(f=>{
+    const y=pad.t+iH*(1-f);
+    ctx2.beginPath();ctx2.moveTo(pad.l,y);ctx2.lineTo(W-pad.r,y);ctx2.stroke();
+    ctx2.fillStyle='#aaa'; ctx2.font='9px IBM Plex Mono'; ctx2.textAlign='right';
+    ctx2.fillText(Math.round(max*f).toLocaleString(),pad.l-4,y+3);
+  });
+
+  // Shade peak
+  const p1=pad.l+iW*18/23, p2=pad.l+iW*22/23;
+  ctx2.fillStyle='rgba(192,57,43,0.06)'; ctx2.fillRect(p1,pad.t,p2-p1,iH);
+
+  // Line
+  ctx2.strokeStyle='#1a3a6b'; ctx2.lineWidth=2; ctx2.beginPath();
+  rates.forEach((r,h)=>{
+    const px2=pad.l+iW*h/23, py=pad.t+iH*(1-r/max);
+    h===0?ctx2.moveTo(px2,py):ctx2.lineTo(px2,py);
+  });
+  ctx2.stroke();
+
+  // Current hour
+  const curX=pad.l+iW*curH/23;
+  ctx2.strokeStyle='#c0392b'; ctx2.lineWidth=1.5; ctx2.setLineDash([4,3]);
+  ctx2.beginPath();ctx2.moveTo(curX,pad.t);ctx2.lineTo(curX,pad.t+iH);ctx2.stroke();
+  ctx2.setLineDash([]);
+
+  ctx2.fillStyle='#aaa'; ctx2.font='9px IBM Plex Mono'; ctx2.textAlign='center';
+  [0,6,12,18,23].forEach(h=>{
+    ctx2.fillText(String(h).padStart(2,'0')+'h',pad.l+iW*h/23,H-6);
+  });
+  ctx2.fillStyle='rgba(192,57,43,0.5)'; ctx2.font='9px IBM Plex Mono'; ctx2.textAlign='center';
+  ctx2.fillText('peak (18–22h)',pad.l+iW*20/23,pad.t+8);
+}
+
+// Init — placement is default panel
+predictPlacement();
+updateGraph();
+initXOR();
+updateSleep();
+setTimeout(()=>{updateWifi();},100);
+ensureWeights(); // pre-fetch MNIST weights in background
+</script>
+</body>
+</html>

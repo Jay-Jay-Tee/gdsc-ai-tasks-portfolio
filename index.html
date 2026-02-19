@@ -517,9 +517,9 @@ label {
     <h1>Machine Learning<br>Portfolio</h1>
   </div>
   <div class="masthead-right">
-    6 Projects<br>
-    Beginner → Advanced<br>
-    Python · PyTorch · Sklearn<br>
+    Joshua Jacob Thomas<br>
+    First Year B.Tech CSE<br>
+    NIT Calicut<br>
     Feb 2026
   </div>
 </header>
@@ -825,7 +825,7 @@ const ctx = canvas.getContext('2d');
 let isDrawing = false;
 let skipAnim = false;
 ctx.fillStyle='#000'; ctx.fillRect(0,0,280,280);
-ctx.strokeStyle='#fff'; ctx.lineWidth=20; ctx.lineCap='round'; ctx.lineJoin='round';
+ctx.strokeStyle='#fff'; ctx.lineWidth=14; ctx.lineCap='round'; ctx.lineJoin='round';
 
 function getXY(e) {
   const r=canvas.getBoundingClientRect();
@@ -913,21 +913,65 @@ function mlpForward(input) {
 }
 
 function getPixels() {
-  // Downsample 280×280 canvas → 28×28, then apply your normalization:
-  // transforms.ToTensor() converts [0,255] → [0,1]
-  // transforms.Normalize((0.5,),(0.5,)) converts [0,1] → [-1,1]
-  // Combined: pixel_norm = (raw/255 - 0.5) / 0.5  =  raw/255 * 2 - 1
-  const imgData = ctx.getImageData(0,0,280,280).data;
-  const px = new Float32Array(784);
-  for(let r=0;r<28;r++) for(let c=0;c<28;c++){
-    let s=0;
-    for(let dr=0;dr<10;dr++) for(let dc=0;dc<10;dc++){
-      const idx=((r*10+dr)*280+(c*10+dc))*4;
-      s+=imgData[idx]; // R channel (grayscale white stroke)
+  // ── Step 1: get raw 280×280 grayscale ──────────────────────────────────
+  const raw = ctx.getImageData(0,0,280,280).data;
+  const gray = new Float32Array(280*280);
+  for(let i=0;i<280*280;i++) gray[i] = raw[i*4] / 255; // R channel, [0,1]
+
+  // ── Step 2: find bounding box of drawn ink ─────────────────────────────
+  let minR=280,maxR=0,minC=280,maxC=0;
+  for(let r=0;r<280;r++) for(let c=0;c<280;c++){
+    if(gray[r*280+c]>0.1){ // threshold to find ink
+      if(r<minR)minR=r; if(r>maxR)maxR=r;
+      if(c<minC)minC=c; if(c>maxC)maxC=c;
     }
-    const rawMean = s / 100;           // average over 10×10 block, [0,255]
-    px[r*28+c] = rawMean/255*2 - 1;   // your exact normalization → [-1,1]
   }
+
+  // If canvas is empty, return zeros
+  if(maxR<=minR||maxC<=minC) return new Float32Array(784);
+
+  // ── Step 3: crop to bounding box with padding ──────────────────────────
+  const pad = 30;
+  minR=Math.max(0,minR-pad); maxR=Math.min(279,maxR+pad);
+  minC=Math.max(0,minC-pad); maxC=Math.min(279,maxC+pad);
+  const bH=maxR-minR, bW=maxC-minC;
+
+  // ── Step 4: scale crop into a 20×20 box (MNIST standard), centered in 28×28
+  // MNIST digits are roughly 20×20 centered in 28×28 with 4px border
+  const targetSize = 20;
+  const scale = targetSize / Math.max(bH, bW);
+  const scaledH = Math.round(bH*scale);
+  const scaledW = Math.round(bW*scale);
+
+  // Bilinear downsample crop → scaledH×scaledW
+  const scaled = new Float32Array(scaledH*scaledW);
+  for(let r=0;r<scaledH;r++) for(let c=0;c<scaledW;c++){
+    const srcR = minR + r/scale;
+    const srcC = minC + c/scale;
+    const r0=Math.floor(srcR), c0=Math.floor(srcC);
+    const r1=Math.min(r0+1,279), c1=Math.min(c0+1,279);
+    const dr=srcR-r0, dc=srcC-c0;
+    scaled[r*scaledW+c] =
+      gray[r0*280+c0]*(1-dr)*(1-dc) +
+      gray[r0*280+c1]*(1-dr)*dc +
+      gray[r1*280+c0]*dr*(1-dc) +
+      gray[r1*280+c1]*dr*dc;
+  }
+
+  // ── Step 5: place into 28×28 centered ─────────────────────────────────
+  const out28 = new Float32Array(28*28); // zeros = black background
+  const offR = Math.floor((28-scaledH)/2);
+  const offC = Math.floor((28-scaledW)/2);
+  for(let r=0;r<scaledH;r++) for(let c=0;c<scaledW;c++){
+    const dr=offR+r, dc=offC+c;
+    if(dr>=0&&dr<28&&dc>=0&&dc<28)
+      out28[dr*28+dc] = scaled[r*scaledW+c];
+  }
+
+  // ── Step 6: apply your exact training normalization ────────────────────
+  // transforms.Normalize((0.5,),(0.5,))  →  pixel*2 - 1  (range [-1,1])
+  const px = new Float32Array(784);
+  for(let i=0;i<784;i++) px[i] = out28[i]*2 - 1;
   return px;
 }
 
@@ -939,12 +983,12 @@ async function runInference(){
   const px = getPixels();
   const {h, probs} = mlpForward(px);
 
-  // Show pixel grid
+  // Show pixel grid — display the actual preprocessed input the model sees
   const pxCanvas = document.getElementById('pixel-canvas');
   const pxCtx = pxCanvas.getContext('2d');
   const imgData2 = pxCtx.createImageData(28,28);
   for(let i=0;i<784;i++){
-    const v = Math.round(Math.min(255,Math.max(0,(px[i]*0.3081+0.1307)*255)));
+    const v = Math.round(Math.min(255,Math.max(0,(px[i]+1)/2*255))); // [-1,1] → [0,255]
     imgData2.data[i*4]=v; imgData2.data[i*4+1]=v; imgData2.data[i*4+2]=v; imgData2.data[i*4+3]=255;
   }
   pxCtx.putImageData(imgData2,0,0);

@@ -553,9 +553,6 @@ label {
 
   <div class="demo-card">
     <div class="demo-card-title">Interactive Inference — Draw a digit</div>
-    <div class="mnist-note">
-      ⚠ Note: this runs a JavaScript MLP with the same architecture as your PyTorch model. To load your <em>exact</em> trained weights, export them with <code>torch.save(model.state_dict(), 'weights.pth')</code>, convert to JSON (instructions below), and the page will load them automatically.
-    </div>
     <div class="mnist-layout">
       <div class="canvas-wrap">
         <canvas id="draw-canvas" width="280" height="280"></canvas>
@@ -574,7 +571,7 @@ label {
           <div style="font-size:22px;color:var(--muted);padding-top:30px;">→</div>
           <div style="flex:1;">
             <div class="viz-step-label">Layer activations</div>
-            <canvas id="nn-viz" height="220" style="width:100%;display:block;border:1px solid var(--rule);background:#fff;"></canvas>
+            <canvas id="nn-viz" height="220" style="width:100%;display:block;border:1px solid #2a2a3a;background:#0f0f14;border-radius:4px;"></canvas>
           </div>
         </div>
         <div id="pred-display" style="display:none;">
@@ -978,7 +975,7 @@ function getPixels() {
 async function runInference(){
   const ok = await ensureWeights();
   if (!ok) return;
-  skipAnim=false;
+  skipAnim=false; // reset only here so clicking Skip mid-animation still works
   document.getElementById('idle-msg').style.display='none';
   const px = getPixels();
   const {h, probs} = mlpForward(px);
@@ -1006,93 +1003,145 @@ async function runInference(){
 
 async function animateNN(px, h, probs) {
   const vizCanvas = document.getElementById('nn-viz');
-  const W = vizCanvas.offsetWidth || 400;
-  vizCanvas.width = W;
+  const dpr = window.devicePixelRatio || 1;
+  const cssW = vizCanvas.parentElement.offsetWidth || 400;
+  const cssH = 220;
+  vizCanvas.width = cssW * dpr;
+  vizCanvas.height = cssH * dpr;
+  vizCanvas.style.width = cssW + 'px';
+  vizCanvas.style.height = cssH + 'px';
   const vc = vizCanvas.getContext('2d');
-  const H = 220;
-  vc.clearRect(0,0,W,H);
-  vc.fillStyle='#fff'; vc.fillRect(0,0,W,H);
+  vc.scale(dpr, dpr);
+  const W = cssW, H = cssH;
 
-  // Sample neurons to show: 16 input, 16 hidden, 10 output
-  const inputSample = Array.from({length:16},(_,i)=>Math.floor(i*784/16));
-  const hiddenSample = Array.from({length:16},(_,i)=>Math.floor(i*128/16));
+  const pred = probs.indexOf(Math.max(...probs));
+  const inputSample = Array.from({length:18},(_,i)=>Math.floor(i*784/18));
+  const hiddenSample = Array.from({length:18},(_,i)=>Math.floor(i*128/18));
+  const hArr = Array.from(h);
+  const hMax = Math.max(...hArr) || 1;
 
   const layers = [
-    {neurons: inputSample.map(i=>({v:px[i]*0.3081+0.1307,lbl:i})), label:'Input (16/784)', x:0.08},
-    {neurons: hiddenSample.map(i=>({v:h[i]/Math.max(...Array.from(h))||0,lbl:i})), label:'Hidden (16/128)', x:0.5},
-    {neurons: probs.map((v,i)=>({v,lbl:i})), label:'Output (10)', x:0.88},
+    {neurons: inputSample.map(i=>({v:Math.max(0,(px[i]+1)/2), lbl:''})), label:'Input', sublabel:'784 neurons', x:0.10},
+    {neurons: hiddenSample.map(i=>({v:hArr[i]/hMax, lbl:''})),           label:'Hidden', sublabel:'128 neurons', x:0.50},
+    {neurons: probs.map((v,i)=>({v, lbl:String(i)})),                    label:'Output', sublabel:'10 classes', x:0.88},
   ];
-
-  const r = 7;
   const layerX = layers.map(l=>l.x*W);
+  const nr = 6; // neuron radius
 
-  function drawState(progress) {
+  function getY(i,total){ return 18+(H-44)*((i+0.5)/total); }
+
+  // Colour helpers
+  function neuronColor(li, ni, intensity){
+    if(li===2){
+      const isWinner = parseInt(layers[2].neurons[ni].lbl)===pred;
+      if(isWinner) return {fill:`rgba(20,180,80,${0.2+intensity*0.8})`, stroke:`rgba(20,200,90,${0.6+intensity*0.4})`, glow:'rgba(20,200,90,0.4)'};
+      return {fill:`rgba(60,120,220,${0.1+intensity*0.7})`, stroke:`rgba(80,140,240,${0.4+intensity*0.5})`, glow:null};
+    }
+    if(li===1) return {fill:`rgba(180,120,20,${0.1+intensity*0.75})`, stroke:`rgba(220,160,40,${0.4+intensity*0.5})`, glow: intensity>0.6?'rgba(220,160,40,0.3)':null};
+    return {fill:`rgba(60,120,220,${0.05+intensity*0.8})`, stroke:`rgba(80,140,240,${0.3+intensity*0.6})`, glow: intensity>0.7?'rgba(80,140,240,0.3)':null};
+  }
+
+  function drawState(progress){
     vc.clearRect(0,0,W,H);
-    vc.fillStyle='#fff'; vc.fillRect(0,0,W,H);
+    // Dark background
+    vc.fillStyle='#0f0f14'; vc.fillRect(0,0,W,H);
+    // Subtle grid
+    vc.strokeStyle='rgba(255,255,255,0.03)'; vc.lineWidth=0.5;
+    for(let gx=0;gx<W;gx+=20){vc.beginPath();vc.moveTo(gx,0);vc.lineTo(gx,H);vc.stroke();}
+    for(let gy=0;gy<H;gy+=20){vc.beginPath();vc.moveTo(0,gy);vc.lineTo(W,gy);vc.stroke();}
 
-    // Draw connections (sampled)
-    if(progress > 0.3) {
-      const alpha = Math.min(1,(progress-0.3)/0.4);
+    // Connections layer 0→1
+    if(progress>0.25){
+      const alpha=Math.min(1,(progress-0.25)/0.35);
       for(let a=0;a<layers[0].neurons.length;a+=2){
         for(let b=0;b<layers[1].neurons.length;b+=2){
-          const y0=getY(a,layers[0].neurons.length,H);
-          const y1=getY(b,layers[1].neurons.length,H);
-          vc.strokeStyle=`rgba(26,58,107,${0.06*alpha})`;
-          vc.lineWidth=1;
+          const y0=getY(a,layers[0].neurons.length), y1=getY(b,layers[1].neurons.length);
+          const strength=layers[0].neurons[a].v*layers[1].neurons[b].v;
+          vc.strokeStyle=`rgba(80,140,240,${0.04*alpha + strength*0.08*alpha})`;
+          vc.lineWidth=0.5;
           vc.beginPath();vc.moveTo(layerX[0],y0);vc.lineTo(layerX[1],y1);vc.stroke();
         }
       }
     }
-    if(progress > 0.6) {
-      const alpha = Math.min(1,(progress-0.6)/0.3);
+    // Connections layer 1→2
+    if(progress>0.6){
+      const alpha=Math.min(1,(progress-0.6)/0.3);
       for(let a=0;a<layers[1].neurons.length;a+=2){
         for(let b=0;b<layers[2].neurons.length;b++){
-          const y0=getY(a,layers[1].neurons.length,H);
-          const y1=getY(b,layers[2].neurons.length,H);
-          vc.strokeStyle=`rgba(26,58,107,${0.08*alpha})`;
-          vc.lineWidth=1;
+          const y0=getY(a,layers[1].neurons.length), y1=getY(b,layers[2].neurons.length);
+          const iw = parseInt(layers[2].neurons[b].lbl)===pred ? 1 : 0;
+          vc.strokeStyle=`rgba(80,140,240,${(0.04+iw*0.12)*alpha})`;
+          vc.lineWidth= iw ? 0.8 : 0.4;
           vc.beginPath();vc.moveTo(layerX[1],y0);vc.lineTo(layerX[2],y1);vc.stroke();
         }
       }
     }
 
-    // Draw neurons
+    // Neurons
     layers.forEach((layer,li)=>{
-      const showProgress = li===0?1:li===1?Math.min(1,progress/0.5):Math.min(1,(progress-0.5)/0.5);
+      const revealProg = li===0 ? 1 : li===1 ? Math.min(1,progress/0.45) : Math.min(1,(progress-0.5)/0.45);
       layer.neurons.forEach((n,ni)=>{
-        if(ni/layer.neurons.length > showProgress) return;
-        const y=getY(ni,layer.neurons.length,H);
-        const intensity = Math.max(0,Math.min(1,n.v));
-        if(li===2 && n.lbl===probs.indexOf(Math.max(...probs))){
-          vc.fillStyle=`rgba(26,92,58,${0.15+intensity*0.85})`;
-          vc.strokeStyle='rgb(26,92,58)';
-        } else {
-          vc.fillStyle=`rgba(26,58,107,${0.08+intensity*0.85})`;
-          vc.strokeStyle=`rgba(26,58,107,${0.3+intensity*0.7})`;
+        const frac = (ni+1)/layer.neurons.length;
+        if(frac > revealProg+0.05) return;
+        const fade = Math.min(1,(revealProg-frac+0.1)/0.1);
+        const y=getY(ni,layer.neurons.length);
+        const intensity=Math.max(0,Math.min(1,n.v));
+        const col=neuronColor(li,ni,intensity);
+
+        // Glow
+        if(col.glow && fade>0.5){
+          const grd=vc.createRadialGradient(layerX[li],y,nr,layerX[li],y,nr*3.5);
+          grd.addColorStop(0,col.glow); grd.addColorStop(1,'transparent');
+          vc.fillStyle=grd; vc.beginPath(); vc.arc(layerX[li],y,nr*3.5,0,Math.PI*2); vc.fill();
         }
-        vc.lineWidth=1;
-        vc.beginPath();vc.arc(layerX[li],y,r,0,Math.PI*2);vc.fill();vc.stroke();
+        // Circle
+        vc.globalAlpha=fade;
+        vc.fillStyle=col.fill; vc.strokeStyle=col.stroke; vc.lineWidth=1;
+        vc.beginPath(); vc.arc(layerX[li],y,nr,0,Math.PI*2); vc.fill(); vc.stroke();
+
+        // Output labels
         if(li===2){
-          vc.fillStyle='#666';vc.font='9px IBM Plex Mono';vc.textAlign='left';
-          vc.fillText(n.lbl,layerX[li]+r+3,y+3);
+          const isWin = parseInt(n.lbl)===pred;
+          vc.font=`${isWin?'600 ':''}10px IBM Plex Mono`;
+          vc.fillStyle=isWin?'rgba(20,220,90,0.9)':'rgba(200,200,200,0.5)';
+          vc.textAlign='left';
+          vc.fillText(n.lbl, layerX[li]+nr+4, y+3.5);
+          if(isWin){
+            vc.fillStyle='rgba(20,220,90,0.7)';
+            vc.fillText(` ${(n.v*100).toFixed(1)}%`, layerX[li]+nr+14, y+3.5);
+          }
         }
+        vc.globalAlpha=1;
       });
-      // layer label
-      vc.fillStyle='#aaa'; vc.font='9px IBM Plex Mono'; vc.textAlign='center';
-      vc.fillText(layer.label,layerX[li],H-4);
+
+      // Layer labels
+      vc.fillStyle='rgba(160,160,160,0.6)';
+      vc.font='9px IBM Plex Mono'; vc.textAlign='center';
+      vc.fillText(layer.label, layerX[li], H-14);
+      vc.fillStyle='rgba(100,100,100,0.5)';
+      vc.font='8px IBM Plex Mono';
+      vc.fillText(layer.sublabel, layerX[li], H-5);
     });
+
+    // Winner callout
+    if(progress>0.85){
+      const a=Math.min(1,(progress-0.85)/0.15);
+      vc.globalAlpha=a;
+      vc.fillStyle='rgba(20,200,80,0.12)';
+      const wy=getY(pred,10); 
+      vc.fillRect(layerX[2]-nr-2, wy-nr-2, W-layerX[2]+nr+4, nr*2+4);
+      vc.globalAlpha=1;
+    }
   }
 
-  function getY(i,total,H){return 20+(H-40)*((i+0.5)/total);}
-
   if(skipAnim){ drawState(1); return; }
-  const start=performance.now();
-  const dur=1200;
+  const start=performance.now(), dur=1400;
   await new Promise(res=>{
     function frame(now){
       const t=Math.min(1,(now-start)/dur);
       drawState(t);
-      if(t<1) requestAnimationFrame(frame); else res();
+      if(t<1 && !skipAnim) requestAnimationFrame(frame);
+      else { drawState(1); res(); }
     }
     requestAnimationFrame(frame);
   });
@@ -1311,44 +1360,78 @@ function drawAttention(){
   const tokens=text.trim().split(/\s+/).filter(t=>t.length>0);
   const n=Math.min(tokens.length,10);
   if(n<1)return;
-  const c=document.getElementById('attn-canvas');
-  const availW=c.parentElement.offsetWidth||500;
-  const cell=Math.min(Math.floor(availW/(n+1.2)),54);
-  c.width=(n+1)*cell+cell/2; c.height=(n+1)*cell+10;
-  const x=c.getContext('2d');
-  x.clearRect(0,0,c.width,c.height);
-  x.fillStyle='#fff'; x.fillRect(0,0,c.width,c.height);
 
-  // Generate causal attention
+  const c=document.getElementById('attn-canvas');
+  const dpr=window.devicePixelRatio||1;
+  const availW=c.parentElement.offsetWidth||500;
+  const cell=Math.min(Math.floor(availW/(n+1.5)),56);
+  const labelW=cell*1.4;
+  const cssW=labelW+(n*cell)+4;
+  const cssH=labelW+(n*cell)+4;
+
+  c.style.width=cssW+'px'; c.style.height=cssH+'px';
+  c.width=cssW*dpr; c.height=cssH*dpr;
+  const x=c.getContext('2d');
+  x.scale(dpr,dpr);
+
+  // Dark background
+  x.fillStyle='#0f0f14'; x.fillRect(0,0,cssW,cssH);
+
+  // Generate causal attention matrix
   const attn=[];
   for(let i=0;i<n;i++){
-    const row=new Array(n).fill(0);
-    let sum=0;
-    for(let j=0;j<=i;j++){const v=Math.exp(-(i-j)*0.5)*(0.6+Math.random()*0.8);row[j]=v;sum+=v;}
+    const row=new Array(n).fill(0); let sum=0;
+    for(let j=0;j<=i;j++){const v=Math.exp(-(i-j)*0.55)*(0.5+Math.random()*0.9);row[j]=v;sum+=v;}
     for(let j=0;j<=i;j++) row[j]/=sum;
     attn.push(row);
   }
-  const off=cell;
-  x.font=`${Math.max(9,cell/3.8)}px IBM Plex Mono`;
+
+  const off=labelW;
+
+  // Column headers
+  x.font=`${Math.max(9,cell/4.5)}px IBM Plex Mono`;
   x.textAlign='center'; x.textBaseline='middle';
   tokens.slice(0,n).forEach((t,j)=>{
-    x.fillStyle='#333'; x.fillText(t.slice(0,7),off+j*cell+cell/2,cell/2);
+    x.fillStyle='rgba(180,180,200,0.7)';
+    x.fillText(t.slice(0,7), off+j*cell+cell/2, labelW/2);
   });
+  // Row headers
   tokens.slice(0,n).forEach((t,i)=>{
-    x.fillStyle='#333'; x.fillText(t.slice(0,7),cell/2,off+i*cell+cell/2);
+    x.fillStyle='rgba(180,180,200,0.7)';
+    x.textAlign='right'; x.textBaseline='middle';
+    x.fillText(t.slice(0,7), labelW-6, off+i*cell+cell/2);
   });
+
+  // Cells
+  x.textAlign='center'; x.textBaseline='middle';
   for(let i=0;i<n;i++) for(let j=0;j<n;j++){
     const cx=off+j*cell, cy=off+i*cell;
-    if(j>i){ x.fillStyle='#f0ede8'; x.fillRect(cx,cy,cell,cell); }
-    else {
+    if(j>i){
+      // Masked — very dark
+      x.fillStyle='rgba(255,255,255,0.03)'; x.fillRect(cx,cy,cell,cell);
+      x.fillStyle='rgba(255,255,255,0.06)';
+      x.font=`${Math.max(8,cell/5.5)}px IBM Plex Mono`;
+      x.fillText('×', cx+cell/2, cy+cell/2);
+    } else {
       const v=attn[i][j];
-      x.fillStyle=`rgba(26,58,107,${v*0.9+0.05})`; x.fillRect(cx,cy,cell,cell);
-      x.fillStyle=v>0.4?'#fff':'rgba(255,255,255,0.6)';
-      x.fillText((v*100).toFixed(0),cx+cell/2,cy+cell/2);
+      // Color: low = dark navy, high = bright gold/white
+      const r2=Math.round(10+v*50), g2=Math.round(20+v*160), b2=Math.round(80+v*140);
+      x.fillStyle=`rgb(${r2},${g2},${b2})`; x.fillRect(cx,cy,cell,cell);
+      // Percentage text
+      x.font=`${Math.max(8,cell/5)}px IBM Plex Mono`;
+      x.fillStyle=v>0.35?'rgba(0,0,0,0.85)':'rgba(255,255,255,0.6)';
+      x.fillText((v*100).toFixed(0)+'%', cx+cell/2, cy+cell/2);
     }
-    x.strokeStyle='#e8e4de'; x.lineWidth=0.5;
+    // Grid line
+    x.strokeStyle='rgba(255,255,255,0.04)'; x.lineWidth=0.5;
     x.strokeRect(cx,cy,cell,cell);
   }
+
+  // Diagonal label
+  x.font=`8px IBM Plex Mono`;
+  x.fillStyle='rgba(100,100,130,0.5)';
+  x.textAlign='center';
+  x.fillText('← masked (future)', off+n*cell*0.7, off+cell*0.4);
 }
 setTimeout(drawAttention,200);
 

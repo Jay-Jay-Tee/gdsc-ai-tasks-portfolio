@@ -138,6 +138,23 @@ body {
   font-weight: 300;
   font-family: var(--sans);
 }
+.sec-repo {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 1px;
+  transition: color 0.15s, border-color 0.15s;
+}
+.sec-repo:hover { color: var(--ink); border-color: var(--ink); }
+.sec-repo svg { flex-shrink: 0; opacity: 0.6; }
 
 /* METRICS ROW */
 .metrics {
@@ -557,6 +574,7 @@ label {
     <div>
       <div class="sec-title">MNIST Digit Classifier</div>
       <div class="sec-sub">Feedforward neural network (784 → 128 → ReLU → 10) trained with PyTorch on 60,000 handwritten digit images. Below runs a JavaScript reimplementation of the exact same architecture with weights initialised to reproduce the learned behaviour.</div>
+      <a class="sec-repo" href="https://github.com/jay-jay-tee/aiml-induction-task5-mnistpipeline" target="_blank"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>jay-jay-tee / aiml-induction-task5-mnistpipeline</a>
     </div>
   </div>
   <div class="metrics">
@@ -612,6 +630,7 @@ label {
     <div>
       <div class="sec-title">MicroGrad Autograd Engine</div>
       <div class="sec-sub">Scalar-valued automatic differentiation engine built from scratch in Python — no PyTorch, no NumPy. Every operation records its inputs so gradients can flow backwards through the computation graph via the chain rule. Includes a <code>Neuron</code>, <code>Layer</code>, and <code>MLP</code> class built on top of the <code>Value</code> engine.</div>
+      <a class="sec-repo" href="https://github.com/jay-jay-tee/aiml-induction-task4-micrograd" target="_blank"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>jay-jay-tee / aiml-induction-task4-micrograd</a>
     </div>
   </div>
   <div class="metrics">
@@ -712,6 +731,7 @@ label {
     <div>
       <div class="sec-title">GPT-2 Transformer</div>
       <div class="sec-sub">Decoder-only Transformer with masked multi-head self-attention and learned positional encodings — implemented in Python as standalone modules. Click each block in the flow diagram for a detailed explanation.</div>
+      <a class="sec-repo" href="https://github.com/jay-jay-tee/aiml-induction-task7-transformersgpt2" target="_blank"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>jay-jay-tee / aiml-induction-task7-transformersgpt2</a>
     </div>
   </div>
   <div class="metrics">
@@ -809,6 +829,7 @@ label {
     <div>
       <div class="sec-title">Placement Prediction</div>
       <div class="sec-sub">Logistic Regression trained on 10,000 student records. Features include CGPA, aptitude scores, soft skills, internships, and more. Enter a student profile below to get a prediction and see which features drove it most.</div>
+      <a class="sec-repo" href="https://github.com/jay-jay-tee/aiml-induction-task1-willigetplaced" target="_blank"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>jay-jay-tee / aiml-induction-task1-willigetplaced</a>
     </div>
   </div>
   <div class="metrics">
@@ -847,6 +868,7 @@ label {
     <div>
       <div class="sec-title">Sleep & Academic Performance</div>
       <div class="sec-sub">Linear Regression on a survey dataset. Key finding: daytime consequences of poor sleep (fatigue, missed classes, stress) are stronger predictors than sleep duration alone. Adjust the sliders to see the model's prediction and which drivers are dominant.</div>
+      <a class="sec-repo" href="https://github.com/jay-jay-tee/aiml-induction-task3-sleepnstudy" target="_blank"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>jay-jay-tee / aiml-induction-task3-sleepnstudy</a>
     </div>
   </div>
   <div class="metrics">
@@ -889,6 +911,7 @@ label {
     <div>
       <div class="sec-title">Hostel Wi-Fi Performance</div>
       <div class="sec-sub">Random Forest regression on hostel internet session logs. Since no direct speed/latency column exists, a proxy metric is engineered: <em>transfer_rate = total_transfer / usage_seconds</em>. Feature engineering includes cyclic time encoding, log-scaled transfers, and behavioral ratios.</div>
+      <a class="sec-repo" href="https://github.com/jay-jay-tee/aiml-induction-task6-hostelwifiusage" target="_blank"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>jay-jay-tee / aiml-induction-task6-hostelwifiusage</a>
     </div>
   </div>
   <div class="metrics">

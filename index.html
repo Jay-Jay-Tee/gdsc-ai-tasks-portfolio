@@ -609,7 +609,14 @@ label {
     </div>
     <div class="mnist-layout">
       <div class="canvas-wrap">
-        <canvas id="draw-canvas" width="280" height="280"></canvas>
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">↓ Draw your digit here</div>
+        <div style="position:relative;width:280px;height:280px;">
+          <canvas id="draw-canvas" width="280" height="280"></canvas>
+          <div id="draw-hint" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;">
+            <span style="font-family:var(--serif);font-size:3rem;color:rgba(255,255,255,0.12);line-height:1;">0–9</span>
+            <span style="font-family:var(--mono);font-size:10px;letter-spacing:2px;color:rgba(255,255,255,0.18);text-transform:uppercase;margin-top:8px;">draw here</span>
+          </div>
+        </div>
         <div class="btn-row">
           <button class="btn" onclick="runInference()">Run →</button>
           <button class="btn secondary" onclick="clearCanvas()">Clear</button>
@@ -1000,11 +1007,11 @@ function getXY(e) {
   if(e.touches) return {x:(e.touches[0].clientX-r.left)*sx,y:(e.touches[0].clientY-r.top)*sy};
   return {x:(e.clientX-r.left)*sx,y:(e.clientY-r.top)*sy};
 }
-canvas.addEventListener('mousedown',e=>{isDrawing=true;ctx.beginPath();const p=getXY(e);ctx.moveTo(p.x,p.y);});
+canvas.addEventListener('mousedown',e=>{isDrawing=true;ctx.beginPath();const p=getXY(e);ctx.moveTo(p.x,p.y);const h=document.getElementById('draw-hint');if(h)h.style.display='none';});
 canvas.addEventListener('mousemove',e=>{if(!isDrawing)return;const p=getXY(e);ctx.lineTo(p.x,p.y);ctx.stroke();});
 canvas.addEventListener('mouseup',()=>isDrawing=false);
 canvas.addEventListener('mouseleave',()=>isDrawing=false);
-canvas.addEventListener('touchstart',e=>{e.preventDefault();isDrawing=true;ctx.beginPath();const p=getXY(e);ctx.moveTo(p.x,p.y);},{passive:false});
+canvas.addEventListener('touchstart',e=>{e.preventDefault();isDrawing=true;ctx.beginPath();const p=getXY(e);ctx.moveTo(p.x,p.y);const h=document.getElementById('draw-hint');if(h)h.style.display='none';},{passive:false});
 canvas.addEventListener('touchmove',e=>{e.preventDefault();if(!isDrawing)return;const p=getXY(e);ctx.lineTo(p.x,p.y);ctx.stroke();},{passive:false});
 canvas.addEventListener('touchend',()=>isDrawing=false);
 
@@ -1013,6 +1020,7 @@ function clearCanvas(){
   document.getElementById('pred-display').style.display='none';
   document.getElementById('viz-steps').style.display='none';
   document.getElementById('idle-msg').style.display='block';
+  const h=document.getElementById('draw-hint');if(h)h.style.display='flex';
 }
 function skipAnimation(){ skipAnim=true; }
 

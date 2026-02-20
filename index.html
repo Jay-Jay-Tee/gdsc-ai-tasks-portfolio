@@ -590,7 +590,21 @@ label {
   </div>
   <div class="demo-card">
     <div class="demo-card-title">Interactive Inference — Draw a digit</div>
-    <div class="mnist-note">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">
+      <div style="padding:14px 16px;background:var(--paper2);border-left:3px solid var(--gold);font-family:var(--mono);font-size:11px;color:var(--muted);line-height:2;">
+        <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ink);margin-bottom:8px;font-weight:500;">Tips for best results</div>
+        Draw large — fill most of the canvas<br>
+        Keep strokes thick and centred<br>
+        Write naturally, not in outline style<br>
+        One digit only, no decorations<br>
+        Clear and redraw if it looks cramped
+      </div>
+      <div style="padding:14px 16px;background:var(--paper2);border-left:3px solid var(--rule);font-family:var(--mono);font-size:11px;color:var(--muted);line-height:2;">
+        <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ink);margin-bottom:8px;font-weight:500;">Demo disclaimer</div>
+        Results won't always be correct — the model reaches 97.16% on clean MNIST images, but handwriting in a browser differs from the training distribution. Thick strokes, off-centre digits, or unusual styles can all trip it up. This is expected and is itself a useful illustration of distribution shift.
+      </div>
+    </div>
+    <div class="mnist-note" style="margin-bottom:20px;">
       Weights loaded from a trained PyTorch model (97.16% test accuracy). Drawing is preprocessed to match MNIST format: bounding box cropped, scaled to 20×20, centered in 28×28, then normalized with <code>Normalize((0.5,),(0.5,))</code>.
     </div>
     <div class="mnist-layout">

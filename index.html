@@ -282,26 +282,30 @@ label {
 /* Neural network visualization */
 #nn-viz {
   width: 100%;
-  height: 220px;
+  height: 320px;
 }
 
 /* Prediction */
 #pred-display {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 20px;
   margin-top: 20px;
+  padding-top: 16px;
+  border-top: 2px solid var(--ink);
 }
 #pred-digit-big {
   font-family: var(--serif);
-  font-size: 5.5rem;
+  font-size: 3rem;
   font-weight: 700;
   color: var(--ink);
   line-height: 1;
-  padding: 0 0 16px;
-  border-bottom: 2px solid var(--ink);
-  margin-bottom: 18px;
+  width: 48px;
+  flex-shrink: 0;
+  padding-top: 2px;
 }
-.prob-bars { width: 100%; }
+.prob-bars { flex: 1; min-width: 0; }
 .prob-row {
   display: flex;
   align-items: center;
@@ -531,8 +535,8 @@ label {
   <button class="index-tab" onclick="switchTab('sleep',this)">02 Sleep & Study</button>
   <button class="index-tab" onclick="switchTab('wifi',this)">03 Wi-Fi Usage</button>
   <button class="index-tab" onclick="switchTab('mnist',this)">04 MNIST</button>
-  <button class="index-tab" onclick="switchTab('micrograd',this)">05 MicroGrad</button>
-  <button class="index-tab" onclick="switchTab('transformer',this)">06 Transformer</button>
+  <button class="index-tab" onclick="switchTab('micrograd',this)">05 MicroGrad <span style="display:block;font-size:9px;opacity:0.6;letter-spacing:1px;">THEORY</span></button>
+  <button class="index-tab" onclick="switchTab('transformer',this)">06 Transformer <span style="display:block;font-size:9px;opacity:0.6;letter-spacing:1px;">THEORY</span></button>
 </nav>
 
 <div class="page-body">
@@ -553,10 +557,13 @@ label {
     <div class="metric"><div class="metric-val">Adam</div><div class="metric-lbl">Optimizer</div></div>
   </div>
 
-  <div class="demo-card">
+  <div class="demo-card" style="background:var(--paper2);">
+    <div class="demo-card-title">How it works</div>
+    <p style="font-size:12px;color:var(--muted);font-family:var(--mono);line-height:1.9;margin:0;">Each 28×28 greyscale image is flattened into a vector of 784 pixel values and fed into a feedforward network. The first layer projects this into 128 neurons and applies ReLU — zeroing out negative activations. The second layer maps those 128 values to 10 output scores (one per digit class). The class with the highest score is the prediction. Training minimises cross-entropy loss using Adam: an optimiser that adapts the learning rate per-parameter based on a running estimate of gradient magnitude. After 5 epochs over 60,000 training images, the network reaches 97.16% accuracy on unseen test data.</p>
+  </div>
     <div class="demo-card-title">Interactive Inference — Draw a digit</div>
     <div class="mnist-note">
-      Weights loaded from your trained PyTorch model (97.16% test accuracy). Drawing is preprocessed to match MNIST: bounding box cropped, scaled to 20×20, centered in 28×28, then normalized with <code>Normalize((0.5,),(0.5,))</code>.
+      Weights loaded from a trained PyTorch model (97.16% test accuracy). Drawing is preprocessed to match MNIST format: bounding box cropped, scaled to 20×20, centered in 28×28, then normalized with <code>Normalize((0.5,),(0.5,))</code>.
     </div>
     <div class="mnist-layout">
       <div class="canvas-wrap">
@@ -575,7 +582,7 @@ label {
           <div style="font-size:22px;color:var(--muted);padding-top:50px;">→</div>
           <div style="flex:1;">
             <div class="viz-step-label">Layer activations</div>
-            <canvas id="nn-viz" height="220" style="width:100%;display:block;border:1px solid #2a2a3a;background:#0f0f14;border-radius:4px;"></canvas>
+            <canvas id="nn-viz" height="320" style="width:100%;display:block;border:1px solid #2a2a3a;background:#0f0f14;border-radius:4px;"></canvas>
           </div>
         </div>
         <div id="pred-display" style="display:none;">
@@ -594,29 +601,77 @@ label {
     <span class="sec-num">05 /</span>
     <div>
       <div class="sec-title">MicroGrad Autograd Engine</div>
-      <div class="sec-sub">Scalar-valued automatic differentiation engine built from scratch. Each operation builds a computation graph; <code>backward()</code> traverses it in reverse applying the chain rule. Below: live graph for e = tanh(a×b + c), and a trained XOR network showing the decision boundary your model learned.</div>
+      <div class="sec-sub">Scalar-valued automatic differentiation engine built from scratch in Python — no PyTorch, no NumPy. Every operation records its inputs so gradients can flow backwards through the computation graph via the chain rule. Includes a <code>Neuron</code>, <code>Layer</code>, and <code>MLP</code> class built on top of the <code>Value</code> engine.</div>
     </div>
   </div>
   <div class="metrics">
-    <div class="metric"><div class="metric-val">From Scratch</div><div class="metric-lbl">No PyTorch</div></div>
+    <div class="metric"><div class="metric-val">From Scratch</div><div class="metric-lbl">No Libraries</div></div>
     <div class="metric"><div class="metric-val">2→4→4→1</div><div class="metric-lbl">XOR Network</div></div>
-    <div class="metric"><div class="metric-val">MSE</div><div class="metric-lbl">Loss Function</div></div>
-    <div class="metric"><div class="metric-val">tanh / ReLU</div><div class="metric-lbl">Activations</div></div>
+    <div class="metric"><div class="metric-val">0.1</div><div class="metric-lbl">Learning Rate</div></div>
+    <div class="metric"><div class="metric-val">2000</div><div class="metric-lbl">Training Steps</div></div>
+  </div>
+
+  <div class="demo-card" style="background:var(--paper2);">
+    <div class="demo-card-title">How it works</div>
+    <p style="font-size:12px;color:var(--muted);font-family:var(--mono);line-height:1.9;margin:0;">MicroGrad is a re-implementation of the core mechanism behind PyTorch's <code>autograd</code> — built from scratch using only Python's standard library. The central class is <code>Value</code>, which wraps a scalar and overloads arithmetic operators (<code>+</code>, <code>*</code>, <code>**</code>) and activations (<code>tanh</code>, <code>relu</code>) to record the computation graph as operations are performed. Calling <code>.backward()</code> performs a topological sort of the graph and walks it in reverse, applying the chain rule at each node to accumulate gradients. On top of this engine, <code>Neuron</code>, <code>Layer</code>, and <code>MLP</code> classes are built — each exposing a <code>.parameters()</code> method and a <code>.zero_grad()</code> call, mirroring PyTorch's API. The XOR task — which requires a non-linear decision boundary — is solved using a 2→4→4→1 MLP trained with MSE loss and vanilla gradient descent for 2000 steps.</p>
   </div>
 
   <div class="demo-card">
-    <div class="demo-card-title">Live Computation Graph — e = tanh(a × b + c)</div>
+    <div class="demo-card-title">How Backpropagation Works — step by step</div>
+    <p style="font-size:12px;color:var(--muted);font-family:var(--mono);margin-bottom:16px;line-height:1.8;">The <code>Value</code> class wraps a number and tracks every operation performed on it. Calling <code>.backward()</code> walks the graph in reverse and applies the chain rule at each node — computing how much each input contributed to the final output. That number is the <strong>gradient</strong>: the direction and magnitude to nudge a weight to reduce loss.</p>
+    <div style="padding:14px 16px;background:var(--paper2);border-left:3px solid var(--ink);font-family:var(--mono);font-size:11px;color:var(--muted);line-height:2.2;margin-bottom:20px;">
+      <strong>Chain rule in one line:</strong> &nbsp; if <code>e = f(d)</code> and <code>d = g(a)</code>, then <code>∂e/∂a = (∂e/∂d) × (∂d/∂a)</code><br>
+      MicroGrad does this automatically for every node in the graph.
+    </div>
     <div class="mg-inputs">
       <div><label>a</label><input type="number" id="mg-a" value="2.0" step="0.5" oninput="updateGraph()"></div>
       <div><label>b</label><input type="number" id="mg-b" value="-3.0" step="0.5" oninput="updateGraph()"></div>
       <div><label>c</label><input type="number" id="mg-c" value="10.0" step="0.5" oninput="updateGraph()"></div>
     </div>
+    <div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:12px;">Expression: <strong>e = tanh(a × b + c)</strong> — change any input and watch the gradients update instantly.</div>
     <div id="comp-graph"></div>
+    <div id="grad-explanation" style="margin-top:16px;padding:12px 16px;background:var(--paper2);font-family:var(--mono);font-size:11px;color:var(--muted);line-height:2;display:none;"></div>
   </div>
 
   <div class="demo-card">
-    <div class="demo-card-title">XOR Training — Decision Boundary (what your network actually learned)</div>
-    <p style="font-size:12px;color:var(--muted);font-family:var(--mono);margin-bottom:16px;line-height:1.7;">The XOR problem has no linear solution — it requires a hidden layer. After training, the network carves a non-linear boundary. The heatmap shows the network's output across the input space: <span style="color:var(--blue)">■ blue = class +1</span>, <span style="color:var(--red)">■ red = class –1</span>. The 4 XOR points are shown as circles.</p>
+    <div class="demo-card-title">Gradient Descent — watch a single weight learn</div>
+    <p style="font-size:12px;color:var(--muted);font-family:var(--mono);margin-bottom:16px;line-height:1.8;">This shows exactly what happens each step of training. A single weight <code>w</code> tries to minimise loss <code>L = (w × x − y)²</code>. Each iteration: compute loss → call <code>backward()</code> → nudge <code>w</code> by <code>−lr × w.grad</code>. Watch the weight converge to the target. This is the same loop the XOR network runs 2000 times across all its parameters.</p>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px;align-items:center;">
+      <div style="flex:1;min-width:140px;"><label>Target value y</label><input type="range" min="-2" max="2" step="0.1" value="1.0" id="gd-target" oninput="resetGD()"></div>
+      <div style="flex:1;min-width:140px;"><label>Learning rate — <strong id="gd-lr-lbl">0.1</strong></label><input type="range" min="0.01" max="0.5" step="0.01" value="0.1" id="gd-lr" oninput="resetGD()"></div>
+      <button class="btn" onclick="stepGD()" id="gd-btn">Step →</button>
+      <button class="btn secondary" onclick="runGD()">Run all</button>
+      <button class="btn secondary" onclick="resetGD()">Reset</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div>
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Weight over time</div>
+        <canvas id="gd-canvas" width="300" height="160" style="width:100%;border:1px solid var(--rule);background:#fff;display:block;"></canvas>
+      </div>
+      <div style="font-family:var(--mono);font-size:12px;padding:12px;background:var(--paper2);border:1px solid var(--rule);">
+        <div style="margin-bottom:8px;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);">Current state</div>
+        <div id="gd-state" style="line-height:2.4;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="demo-card">
+    <div class="demo-card-title">tanh vs ReLU — activation functions</div>
+    <p style="font-size:12px;color:var(--muted);font-family:var(--mono);margin-bottom:16px;line-height:1.8;">The <code>Value</code> class implements both <code>tanh</code> and <code>relu</code>. The <code>Neuron</code> class uses <code>tanh</code> by default. Activations are what make neural networks non-linear — without them, stacking layers is mathematically equivalent to a single linear transformation. Hover over the chart to see exact values and derivatives.</p>
+    <div style="overflow:hidden;border:1px solid var(--rule);">
+      <canvas id="activ-canvas" style="display:block;width:100%;cursor:crosshair;" height="180"></canvas>
+    </div>
+    <div id="activ-label" style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:8px;min-height:18px;text-align:center;"></div>
+    <div style="display:flex;gap:20px;margin-top:10px;font-family:var(--mono);font-size:11px;color:var(--muted);flex-wrap:wrap;">
+      <div><span style="display:inline-block;width:20px;height:2px;background:var(--blue);vertical-align:middle;margin-right:6px;"></span>tanh(x) — used in Neuron class</div>
+      <div><span style="display:inline-block;width:20px;height:2px;background:var(--red);vertical-align:middle;margin-right:6px;"></span>relu(x) — implemented in Value</div>
+      <div><span style="display:inline-block;width:20px;height:2px;background:#aaa;vertical-align:middle;margin-right:6px;border-top:1px dashed #aaa;"></span>tanh derivative: 1 − tanh²(x)</div>
+    </div>
+  </div>
+
+  <div class="demo-card">
+    <div class="demo-card-title">XOR — why hidden layers matter</div>
+    <p style="font-size:12px;color:var(--muted);font-family:var(--mono);margin-bottom:16px;line-height:1.8;">XOR cannot be solved with a straight line — no single boundary separates (0,0) and (1,1) from (0,1) and (1,0). The MLP (2→4→4→1) learns a non-linear boundary through two hidden layers of tanh neurons. The heatmap shows the network's output across the whole input space after 2000 training steps at lr=0.1.</p>
     <div class="btn-row" style="margin-bottom:16px;">
       <button class="btn" onclick="trainXOR()">Train & Show Boundary</button>
       <button class="btn secondary" onclick="resetXOR()">Reset</button>
@@ -627,9 +682,14 @@ label {
         <canvas id="xor-canvas" width="280" height="280" style="border:1px solid var(--rule);display:block;width:280px;height:280px;"></canvas>
       </div>
       <div style="flex:1;min-width:200px;">
-        <div style="font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">Training Loss</div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">Training Loss (MSE)</div>
         <canvas id="loss-canvas" width="400" height="160" style="display:block;width:100%;border:1px solid var(--rule);background:#fff;"></canvas>
         <div id="training-log"></div>
+        <div style="margin-top:12px;padding:12px 14px;background:var(--paper2);border-left:3px solid var(--ink);font-family:var(--mono);font-size:11px;color:var(--muted);line-height:2;">
+          Loss function: <code>L = mean((y_pred − y_true)²)</code><br>
+          Labels: <code>Y = [−1, +1, +1, −1]</code> for XOR inputs<br>
+          Update rule: <code>p.data −= 0.1 × p.grad</code> for each parameter
+        </div>
       </div>
     </div>
   </div>
@@ -649,6 +709,11 @@ label {
     <div class="metric"><div class="metric-val">768</div><div class="metric-lbl">d_model</div></div>
     <div class="metric"><div class="metric-val">Causal</div><div class="metric-lbl">Mask</div></div>
     <div class="metric"><div class="metric-val">GPT-2</div><div class="metric-lbl">Architecture</div></div>
+  </div>
+
+  <div class="demo-card" style="background:var(--paper2);">
+    <div class="demo-card-title">How it works</div>
+    <p style="font-size:12px;color:var(--muted);font-family:var(--mono);line-height:1.9;margin:0;">A Transformer processes all tokens in a sequence simultaneously — unlike RNNs which process one at a time. Each token is first embedded into a 768-dimensional vector, then a learned positional embedding is added so the model knows where each token sits in the sequence. The core operation is <strong>multi-head self-attention</strong>: each token computes Query, Key, and Value projections. Attention scores between token i and j are computed as <code>QᵢKⱼᵀ / √768</code>, then softmaxed to produce weights. Each token's output is a weighted sum of all Value vectors — letting the model selectively focus on relevant context. A causal mask forces the upper triangle of the attention matrix to −∞ before softmax, ensuring no token can attend to future positions. This is repeated across 12 independent heads and 12 stacked blocks, each separated by residual connections and LayerNorm. The modules here — <code>MultiHeadSelfAttention</code> and <code>PositionalEncoding</code> — were implemented from scratch in Python.</p>
   </div>
 
   <div class="demo-card">
@@ -681,45 +746,49 @@ label {
   </div>
 
   <div class="demo-card">
-    <div class="demo-card-title">Positional Encoding — from your positional.py</div>
-    <p style="font-size:12px;color:var(--muted);font-family:var(--mono);margin-bottom:16px;line-height:1.7;">Your <code>PositionalEncoding</code> class adds a learned embedding to each token position. The heatmap below shows <code>pos_embedding[:T]</code> — each row is one token position, each column is one dimension. This is what gets added to token embeddings before the first Transformer block.</p>
+    <div class="demo-card-title">Positional Encoding</div>
+    <p style="font-size:12px;color:var(--muted);font-family:var(--mono);margin-bottom:16px;line-height:1.8;">Transformers process all tokens at once — they have no built-in sense of order. To fix this, a <strong>positional embedding</strong> is added to each token's vector before it enters the network. Each row in the heatmap below is one position in the sequence. Each column is one learned dimension. This matrix gets added element-wise to the token embeddings: <code>X = token_embedding + pos_embedding</code>.</p>
     <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:14px;">
       <div style="flex:1;min-width:160px;">
-        <label>Sequence length T</label>
+        <label>Sequence length T — <strong id="pos-T-lbl">10</strong> tokens</label>
         <input type="range" min="4" max="20" value="10" id="pos-T" oninput="drawPosEncoding()">
       </div>
       <div style="flex:1;min-width:160px;">
-        <label>d_model (shown: first <span id="pos-d-lbl">32</span> dims)</label>
+        <label>Dimensions shown — first <strong id="pos-d-lbl">32</strong> of d_model</label>
         <input type="range" min="8" max="64" step="8" value="32" id="pos-d" oninput="drawPosEncoding()">
       </div>
-      <span style="font-family:var(--mono);font-size:11px;color:var(--muted);">T = <strong id="pos-T-lbl">10</strong></span>
     </div>
-    <canvas id="pos-canvas" style="display:block;width:100%;border:1px solid #2a2a3a;border-radius:4px;"></canvas>
-    <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:8px;">Dark = negative value, light = positive value. Each row is added to the corresponding token embedding: <code>X = token_embeddings + pos_embedding[:T]</code></div>
+    <div style="overflow:hidden;border:1px solid #2a2a3a;border-radius:4px;">
+      <canvas id="pos-canvas" style="display:block;width:100%;"></canvas>
+    </div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:8px;line-height:1.7;">Dark teal = low / negative value. Bright teal = high / positive value. Notice each position has a unique pattern — this is how the model tells tokens apart by position.</div>
   </div>
 
   <div class="demo-card">
-    <div class="demo-card-title">Q / K / V Projections — from your multi.py</div>
-    <p style="font-size:12px;color:var(--muted);font-family:var(--mono);margin-bottom:16px;line-height:1.7;">Your <code>MultiHeadSelfAttention.forward()</code> computes <code>Q = X @ W_Q</code>, <code>K = X @ W_K</code>, <code>V = X @ W_V</code>. Each token gets its own Q, K, V vector. Below shows the first 2 tokens' Q and K vectors for a 4-head, 8-dim model — and the resulting raw attention score <code>Q·Kᵀ / √d_head</code> before masking.</p>
-    <div style="margin-bottom:14px;">
-      <label>Number of attention heads</label>
-      <select id="qkv-heads" onchange="drawQKV()" style="width:auto;display:inline-block;margin-left:8px;">
-        <option value="1">1 head</option>
-        <option value="2" selected>2 heads</option>
-        <option value="4">4 heads</option>
-      </select>
+    <div class="demo-card-title">How Self-Attention Works — click any word</div>
+    <p style="font-size:12px;color:var(--muted);font-family:var(--mono);margin-bottom:16px;line-height:1.8;">Every word in a sentence pays <strong>attention</strong> to other words when deciding what it means. Click any word below to see which other words it attends to — thicker lines mean stronger attention. A word can only look <em>backwards</em> (causal masking), never at words that come after it. This is what lets GPT-2 generate text one token at a time.</p>
+    <div id="attn-sentence" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;"></div>
+    <div style="overflow:hidden;border-radius:4px;width:100%;">
+      <canvas id="attn-flow-canvas" style="display:block;width:100%;"></canvas>
     </div>
-    <div id="qkv-display" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;flex-wrap:wrap;"></div>
+    <div id="attn-flow-label" style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:10px;min-height:20px;"></div>
     <div style="margin-top:16px;padding:14px 16px;background:var(--paper2);border-left:3px solid var(--ink);font-family:var(--mono);font-size:11px;color:var(--muted);line-height:2;">
-      After splitting into heads, your code loops: <code>scores = (q @ k.T) / np.sqrt(d_head)</code> → mask upper triangle → softmax → <code>head_output = attention @ v</code> → concatenate heads → output projection <code>@ W_O</code>
+      Under the hood: each word projects into three vectors — <strong>Query</strong> (what am I looking for?), <strong>Key</strong> (what do I offer?), <strong>Value</strong> (what do I share?). The attention weight from word i to word j = <code>softmax( Qᵢ · Kⱼ / √d )</code>. The output is a weighted sum of all Value vectors.
     </div>
   </div>
 
   <div class="demo-card">
-    <div class="demo-card-title">Causal Attention Matrix — type a sentence</div>
-    <p style="font-size:12px;color:var(--muted);font-family:var(--mono);margin-bottom:12px;line-height:1.7;">Each cell [i,j] = how much token i attends to token j. Upper triangle masked to −∞ (your code: <code>mask = np.triu(np.ones((T,T)), k=1) * -1e9</code>). Softmax makes each row sum to 1.</p>
-    <input type="text" id="tf-text" value="the cat sat on the mat" oninput="drawAttention()" style="margin-bottom:14px;">
-    <canvas id="attn-canvas" style="border-radius:4px;"></canvas>
+    <div class="demo-card-title">Next Word Prediction — what would GPT-2 say?</div>
+    <p style="font-size:12px;color:var(--muted);font-family:var(--mono);margin-bottom:16px;line-height:1.8;">After all the attention and feed-forward layers, the Transformer outputs a probability distribution over every word in its vocabulary (~50,000 words). The model picks the most likely next word. Click a prompt below to see what the top candidates would be — and how confident the model is in each one.</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;" id="prompt-chips"></div>
+    <div style="padding:16px;background:#0f0f14;border-radius:4px;margin-bottom:16px;">
+      <div style="font-family:var(--serif);font-size:1.1rem;color:rgba(255,255,255,0.85);margin-bottom:4px;" id="prompt-text"></div>
+      <div style="font-family:var(--mono);font-size:9px;letter-spacing:2px;color:rgba(255,255,255,0.3);text-transform:uppercase;">← prompt</div>
+    </div>
+    <div id="next-word-bars"></div>
+    <div style="margin-top:16px;padding:14px 16px;background:var(--paper2);border-left:3px solid var(--ink);font-family:var(--mono);font-size:11px;color:var(--muted);line-height:2;">
+      Technically: the final LayerNorm output is projected through the unembedding matrix W_E<sup>T</sup> (shape 768 × 50,257) to produce logits for every token. Softmax converts logits to probabilities. GPT-2 then samples from this distribution — which is why it can produce varied outputs for the same prompt.
+    </div>
   </div>
 </div>
 
@@ -729,7 +798,7 @@ label {
     <span class="sec-num">01 /</span>
     <div>
       <div class="sec-title">Placement Prediction</div>
-      <div class="sec-sub">Logistic Regression trained on 10,000 student records. The model weights below are approximated from your README's feature importance analysis. Enter a student profile to get a prediction and see which features drove it.</div>
+      <div class="sec-sub">Logistic Regression trained on 10,000 student records. Features include CGPA, aptitude scores, soft skills, internships, and more. Enter a student profile below to get a prediction and see which features drove it most.</div>
     </div>
   </div>
   <div class="metrics">
@@ -737,6 +806,11 @@ label {
     <div class="metric"><div class="metric-val">10,000</div><div class="metric-lbl">Training Rows</div></div>
     <div class="metric"><div class="metric-val">12</div><div class="metric-lbl">Features</div></div>
     <div class="metric"><div class="metric-val">80/20</div><div class="metric-lbl">Train/Test Split</div></div>
+  </div>
+
+  <div class="demo-card" style="background:var(--paper2);">
+    <div class="demo-card-title">How it works</div>
+    <p style="font-size:12px;color:var(--muted);font-family:var(--mono);line-height:1.9;margin:0;">Logistic Regression models binary outcomes — placed or not placed — by learning a weighted sum of input features and passing the result through a sigmoid function: <code>p = 1 / (1 + e^−z)</code>, where <code>z = w₁x₁ + w₂x₂ + … + b</code>. Each weight indicates how strongly that feature pushes the prediction towards placement. The model is trained by minimising log-loss (binary cross-entropy) over 10,000 student records with an 80/20 train-test split, reaching 80.8% accuracy. Key insight from feature analysis: placement training and CGPA are the strongest predictors, while raw academic marks carry less weight than expected.</p>
   </div>
 
   <div class="demo-card">
@@ -770,6 +844,11 @@ label {
     <div class="metric"><div class="metric-val">0.529</div><div class="metric-lbl">MAE</div></div>
     <div class="metric"><div class="metric-val">Survey</div><div class="metric-lbl">Data Type</div></div>
     <div class="metric"><div class="metric-val">Linear Reg</div><div class="metric-lbl">Model</div></div>
+  </div>
+
+  <div class="demo-card" style="background:var(--paper2);">
+    <div class="demo-card-title">How it works</div>
+    <p style="font-size:12px;color:var(--muted);font-family:var(--mono);line-height:1.9;margin:0;">Linear Regression fits a straight-line relationship between input features and a continuous output — here, a self-reported academic performance score. The model learns coefficients for each feature such that the sum of squared residuals is minimised. An R² of 0.334 means the model explains about 33% of the variance in academic performance — a meaningful signal from survey data, though the remaining variance is attributable to factors not captured (motivation, teaching quality, individual differences). The key finding is that daytime consequences of poor sleep — fatigue, missed classes, stress — are stronger predictors than sleep duration alone, suggesting that chronic sleep debt matters more than any single night's rest.</p>
   </div>
 
   <div class="demo-card">
@@ -807,6 +886,11 @@ label {
     <div class="metric"><div class="metric-val">508 KB/s</div><div class="metric-lbl">MAE</div></div>
     <div class="metric"><div class="metric-val">Chrono.</div><div class="metric-lbl">Train/Test Split</div></div>
     <div class="metric"><div class="metric-val">Rand Forest</div><div class="metric-lbl">Model</div></div>
+  </div>
+
+  <div class="demo-card" style="background:var(--paper2);">
+    <div class="demo-card-title">How it works</div>
+    <p style="font-size:12px;color:var(--muted);font-family:var(--mono);line-height:1.9;margin:0;">Random Forest is an ensemble of decision trees — each tree is trained on a random subset of the data and features, and predictions are averaged across all trees. This reduces overfitting and improves generalisation. Since the dataset contained no direct network speed column, a proxy metric was engineered: <code>transfer_rate = total_bytes / session_seconds</code>. Additional features include cyclic time encodings (so 23:00 and 00:00 are treated as close, not opposites), log-scaled transfer volumes, and usage behaviour ratios. A chronological train/test split was used — training on earlier sessions, testing on later ones — to simulate real-world deployment where the model must generalise forward in time. The resulting R² of 0.759 indicates the engineered features carry strong predictive signal.</p>
   </div>
 
   <div class="demo-card">
@@ -848,10 +932,10 @@ function switchTab(id, el) {
   document.querySelectorAll('.index-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('panel-'+id).classList.add('active');
   el.classList.add('active');
-  if(id==='transformer'){ setTimeout(()=>{ drawAttention(); drawPosEncoding(); drawQKV(); },50); }
+  if(id==='transformer'){ setTimeout(()=>{ drawPosEncoding(); initAttnFlow(); initNextWord(); },50); }
   if(id==='wifi'){ setTimeout(()=>{updateWifi();},50); }
   if(id==='sleep'){ updateSleep(); }
-  if(id==='micrograd'){ updateGraph(); initXOR(); }
+  if(id==='micrograd'){ setTimeout(()=>{ updateGraph(); initXOR(); resetGD(); drawActivations(); setupActivHover(); },50); }
   if(id==='placement'){ predictPlacement(); }
 }
 
@@ -885,7 +969,7 @@ function clearCanvas(){
 }
 function skipAnimation(){ skipAnim=true; }
 
-// ── Real weights from your trained PyTorch model ──────────────────────────
+// ── Trained model weights (loaded from mnist_weights.json) ───────────────
 // Loaded from mnist_weights.json (must be in same folder as this HTML)
 let mlpWeights = null;
 let weightsLoading = false;
@@ -1044,7 +1128,7 @@ async function animateNN(px, h, probs) {
   const vizCanvas = document.getElementById('nn-viz');
   const dpr = window.devicePixelRatio || 1;
   const cssW = vizCanvas.parentElement.offsetWidth || 400;
-  const cssH = 220;
+  const cssH = 320;
   vizCanvas.width = cssW * dpr;
   vizCanvas.height = cssH * dpr;
   vizCanvas.style.width = cssW + 'px';
@@ -1197,6 +1281,182 @@ function renderProbBars(probs, pred) {
 }
 
 // ===== MICROGRAD =====
+// ===== GRADIENT DESCENT STEPPER =====
+let gdW = 2.0, gdSteps = [], gdRunning = false;
+const GD_X = 1.5; // fixed input
+
+function resetGD() {
+  gdW = 2.0; gdSteps = []; gdRunning = false;
+  document.getElementById('gd-lr-lbl').textContent = parseFloat(document.getElementById('gd-lr').value).toFixed(2);
+  renderGD();
+}
+
+function gdLoss(w) {
+  const y = parseFloat(document.getElementById('gd-target').value) || 1.0;
+  return (w * GD_X - y) ** 2;
+}
+function gdGrad(w) {
+  const y = parseFloat(document.getElementById('gd-target').value) || 1.0;
+  // d/dw (w*x - y)^2 = 2*(w*x - y)*x  — this is exactly what Value.backward() computes
+  return 2 * (w * GD_X - y) * GD_X;
+}
+
+function stepGD() {
+  if(gdSteps.length >= 40) return;
+  const lr = parseFloat(document.getElementById('gd-lr').value);
+  const loss = gdLoss(gdW);
+  const grad = gdGrad(gdW);
+  gdSteps.push({w: gdW, loss, grad});
+  gdW -= lr * grad; // p.data -= lr * p.grad
+  renderGD();
+}
+
+async function runGD() {
+  resetGD();
+  gdRunning = true;
+  for(let i=0;i<40&&gdRunning;i++) { stepGD(); await new Promise(r=>setTimeout(r,60)); }
+  gdRunning = false;
+}
+
+function renderGD() {
+  const c = document.getElementById('gd-canvas');
+  if(!c) return;
+  const dpr = window.devicePixelRatio||1;
+  const cssW = c.parentElement.offsetWidth||300, cssH = 160;
+  c.width=cssW*dpr; c.height=cssH*dpr; c.style.width=cssW+'px'; c.style.height=cssH+'px';
+  const ctx=c.getContext('2d'); ctx.scale(dpr,dpr);
+  const W=cssW, H=cssH, pad={l:36,r:12,t:12,b:24};
+  const iW=W-pad.l-pad.r, iH=H-pad.t-pad.b;
+  ctx.fillStyle='#fff'; ctx.fillRect(0,0,W,H);
+
+  // Draw loss curve as background (parabola)
+  const y_target = parseFloat(document.getElementById('gd-target').value)||1.0;
+  const wMin=-1, wMax=4;
+  ctx.strokeStyle='rgba(200,200,200,0.8)'; ctx.lineWidth=1;
+  ctx.beginPath();
+  for(let px=0;px<iW;px++) {
+    const w=wMin+(wMax-wMin)*px/iW;
+    const l=gdLoss(w);
+    const py=iH-Math.min(l/6*iH,iH-2);
+    if(px===0) ctx.moveTo(pad.l+px,pad.t+py); else ctx.lineTo(pad.l+px,pad.t+py);
+  }
+  ctx.stroke();
+
+  // Axes
+  ctx.fillStyle='#ccc'; ctx.font='8px IBM Plex Mono'; ctx.textAlign='center';
+  ctx.fillText('weight w', pad.l+iW/2, H-4);
+  ctx.fillStyle='#999'; ctx.font='8px IBM Plex Mono'; ctx.textAlign='left';
+  ['0','2','4'].forEach((v,i)=>{ ctx.fillText(v,pad.l+i*iW/2-4,pad.t+iH+12); });
+
+  // Steps
+  gdSteps.forEach((s,i) => {
+    const px=pad.l+(s.w-wMin)/(wMax-wMin)*iW;
+    const l=gdLoss(s.w);
+    const py=pad.t+iH-Math.min(l/6*iH,iH-4);
+    const alpha=0.3+0.7*(i/Math.max(gdSteps.length-1,1));
+    ctx.beginPath(); ctx.arc(px,py,3,0,Math.PI*2);
+    ctx.fillStyle=`rgba(26,58,107,${alpha})`; ctx.fill();
+    if(i>0) {
+      const ps=gdSteps[i-1];
+      const ppx=pad.l+(ps.w-wMin)/(wMax-wMin)*iW;
+      const pl=gdLoss(ps.w);
+      const ppy=pad.t+iH-Math.min(pl/6*iH,iH-4);
+      ctx.beginPath(); ctx.moveTo(ppx,ppy); ctx.lineTo(px,py);
+      ctx.strokeStyle=`rgba(26,58,107,${alpha*0.6})`; ctx.lineWidth=1; ctx.stroke();
+    }
+  });
+
+  // State
+  const state = document.getElementById('gd-state');
+  if(state) {
+    const loss=gdLoss(gdW), grad=gdGrad(gdW);
+    const y_t=parseFloat(document.getElementById('gd-target').value)||1.0;
+    const optimal=y_t/GD_X;
+    state.innerHTML=`
+      Step: <strong>${gdSteps.length}</strong><br>
+      w = <strong>${gdW.toFixed(4)}</strong><br>
+      loss = <strong>${loss.toFixed(6)}</strong><br>
+      grad = <strong>${grad.toFixed(4)}</strong><br>
+      optimal w = <strong>${optimal.toFixed(4)}</strong>`;
+  }
+}
+
+// ===== ACTIVATION FUNCTIONS =====
+function drawActivations() {
+  const c = document.getElementById('activ-canvas');
+  if(!c) return;
+  const dpr=window.devicePixelRatio||1;
+  const cssW=c.parentElement.offsetWidth||500, cssH=180;
+  c.width=cssW*dpr; c.height=cssH*dpr; c.style.width=cssW+'px'; c.style.height=cssH+'px';
+  const ctx=c.getContext('2d'); ctx.scale(dpr,dpr);
+  const W=cssW, H=cssH, pad={l:36,r:16,t:14,b:24};
+  const iW=W-pad.l-pad.r, iH=H-pad.t-pad.b;
+  ctx.fillStyle='#fff'; ctx.fillRect(0,0,W,H);
+
+  const xMin=-3, xMax=3;
+  const toX=v=>pad.l+(v-xMin)/(xMax-xMin)*iW;
+  const toY=v=>pad.t+iH-(v+1.2)/2.4*iH;
+
+  // Grid
+  ctx.strokeStyle='rgba(0,0,0,0.06)'; ctx.lineWidth=0.5;
+  [-1,0,1].forEach(v=>{ ctx.beginPath();ctx.moveTo(pad.l,toY(v));ctx.lineTo(pad.l+iW,toY(v));ctx.stroke(); });
+  ctx.strokeStyle='rgba(0,0,0,0.1)'; ctx.lineWidth=0.5;
+  ctx.beginPath();ctx.moveTo(toX(0),pad.t);ctx.lineTo(toX(0),pad.t+iH);ctx.stroke();
+
+  // Axis labels
+  ctx.fillStyle='#bbb'; ctx.font='8px IBM Plex Mono'; ctx.textAlign='right';
+  [-1,0,1].forEach(v=>ctx.fillText(v,pad.l-3,toY(v)+3));
+
+  // tanh
+  ctx.beginPath(); ctx.strokeStyle='rgba(26,58,107,0.9)'; ctx.lineWidth=2;
+  for(let px=0;px<=iW;px++) {
+    const x=xMin+(xMax-xMin)*px/iW;
+    const y=Math.tanh(x);
+    if(px===0) ctx.moveTo(pad.l+px,toY(y)); else ctx.lineTo(pad.l+px,toY(y));
+  }
+  ctx.stroke();
+
+  // relu
+  ctx.beginPath(); ctx.strokeStyle='rgba(180,30,30,0.8)'; ctx.lineWidth=2;
+  for(let px=0;px<=iW;px++) {
+    const x=xMin+(xMax-xMin)*px/iW;
+    const y=Math.max(0,x);
+    if(px===0) ctx.moveTo(pad.l+px,toY(y)); else ctx.lineTo(pad.l+px,toY(y));
+  }
+  ctx.stroke();
+
+  // tanh derivative: 1 - tanh²(x)
+  ctx.beginPath(); ctx.strokeStyle='rgba(100,100,100,0.4)'; ctx.lineWidth=1; ctx.setLineDash([4,3]);
+  for(let px=0;px<=iW;px++) {
+    const x=xMin+(xMax-xMin)*px/iW;
+    const t=Math.tanh(x); const y=1-t*t; // tanh backward from your code
+    if(px===0) ctx.moveTo(pad.l+px,toY(y)); else ctx.lineTo(pad.l+px,toY(y));
+  }
+  ctx.stroke(); ctx.setLineDash([]);
+
+  c._drawFn = {toX,toY,xMin,xMax,iW,iH,pad};
+}
+
+function setupActivHover() {
+  const c = document.getElementById('activ-canvas');
+  const lbl = document.getElementById('activ-label');
+  if(!c||!lbl) return;
+  c.addEventListener('mousemove', e => {
+    const r=c.getBoundingClientRect();
+    const dpr=window.devicePixelRatio||1;
+    if(!c._drawFn) return;
+    const {toX,toY,xMin,xMax,iW,pad}=c._drawFn;
+    const cssX=(e.clientX-r.left);
+    const x=xMin+(cssX-pad.l)/(iW)*(xMax-xMin);
+    if(x<xMin||x>xMax){lbl.textContent='';return;}
+    const tanh_v=Math.tanh(x);
+    const relu_v=Math.max(0,x);
+    const dtanh=1-tanh_v*tanh_v;
+    lbl.innerHTML=`x = ${x.toFixed(2)} &nbsp;|&nbsp; tanh(x) = ${tanh_v.toFixed(3)} &nbsp;|&nbsp; tanh'(x) = ${dtanh.toFixed(3)} &nbsp;|&nbsp; relu(x) = ${relu_v.toFixed(3)}`;
+  });
+  c.addEventListener('mouseleave',()=>{ if(lbl) lbl.textContent=''; });
+}
+
 function updateGraph(){
   const a=parseFloat(document.getElementById('mg-a').value)||0;
   const b=parseFloat(document.getElementById('mg-b').value)||0;
@@ -1406,213 +1666,344 @@ function drawPosEncoding() {
   document.getElementById('pos-T-lbl').textContent = T;
   document.getElementById('pos-d-lbl').textContent = d;
 
-  // Simulate learned pos_embedding = np.random.randn(max_len, d_model) with fixed seed
   const rng = seededRand(42);
   const emb = Array.from({length:T}, () => Array.from({length:d}, () => (rng()-0.5)*2));
 
   const c = document.getElementById('pos-canvas');
   const dpr = window.devicePixelRatio || 1;
-  const cellH = 28, cellW = Math.max(8, Math.floor((c.parentElement.offsetWidth || 500) / d));
-  const cssW = cellW * d, cssH = cellH * T + 24;
-  c.style.width = cssW + 'px'; c.style.height = cssH + 'px';
-  c.width = cssW * dpr; c.height = cssH * dpr;
+  const containerW = c.parentElement.offsetWidth || 500; // parent is the overflow:hidden div
+  const cellW = Math.max(6, Math.floor(containerW / d));
+  const cellH = 26;
+  const cssW = containerW; // fill container exactly — no overflow
+  const cssH = cellH * T + 24;
+  c.style.width = '100%';
+  c.style.height = cssH + 'px';
+  c.width = cssW * dpr;
+  c.height = cssH * dpr;
   const ctx2 = c.getContext('2d');
   ctx2.scale(dpr, dpr);
   ctx2.fillStyle = '#0f0f14'; ctx2.fillRect(0,0,cssW,cssH);
 
+  const actualCellW = cssW / d;
   for(let i=0;i<T;i++) {
     for(let j=0;j<d;j++) {
-      const v = emb[i][j]; // [-1, 1]
-      const norm = (v + 1) / 2; // [0,1]
-      // dark navy → teal colour map
+      const v = emb[i][j];
+      const norm = (v + 1) / 2;
       const r2 = Math.round(10 + norm*30), g2 = Math.round(20 + norm*150), b2 = Math.round(80 + norm*120);
       ctx2.fillStyle = `rgb(${r2},${g2},${b2})`;
-      ctx2.fillRect(j*cellW, i*cellH, cellW-1, cellH-1);
+      ctx2.fillRect(j*actualCellW, i*cellH, actualCellW-0.5, cellH-1);
     }
-    // Row label
-    ctx2.fillStyle = 'rgba(160,160,180,0.7)';
+    // Row label on right edge
+    ctx2.fillStyle = 'rgba(160,160,180,0.6)';
     ctx2.font = '8px IBM Plex Mono'; ctx2.textAlign = 'right'; ctx2.textBaseline = 'middle';
-    ctx2.fillText('pos '+i, cellW*d-2, i*cellH + cellH/2);
+    ctx2.fillText('pos '+i, cssW-3, i*cellH + cellH/2);
   }
-  // Bottom axis
+  // Bottom axis labels
   ctx2.fillStyle = 'rgba(100,100,130,0.6)';
   ctx2.font = '8px IBM Plex Mono'; ctx2.textAlign = 'center';
   [0, Math.floor(d/4), Math.floor(d/2), Math.floor(3*d/4), d-1].forEach(j => {
-    ctx2.fillText('d='+j, j*cellW+cellW/2, T*cellH+14);
+    ctx2.fillText('d='+j, (j+0.5)*actualCellW, T*cellH + 14);
   });
 }
 
 // ===== Q/K/V PROJECTION VIZ (from multi.py) =====
-function drawQKV() {
-  const heads = parseInt(document.getElementById('qkv-heads').value);
-  const d_model = 8; // small for display
-  const d_head = d_model / heads;
-  const T = 4; // show 4 tokens
+// ===== INTERACTIVE ATTENTION FLOW =====
+const ATTN_SENTENCE = ['the', 'cat', 'sat', 'on', 'the', 'mat'];
+let attnSelected = 5; // default: last word
+let attnWeights = []; // [from][to] after softmax, causal masked
 
-  const rng = seededRand(99);
-  const randn = () => (rng()-0.5)*2;
-
-  // X: T × d_model  (token embeddings, simulated)
-  const X = Array.from({length:T}, () => Array.from({length:d_model}, randn));
-  // Weight matrices  (W_Q, W_K, W_V: d_model × d_model)
-  const W_Q = Array.from({length:d_model}, () => Array.from({length:d_model}, randn));
-  const W_K = Array.from({length:d_model}, () => Array.from({length:d_model}, randn));
-  // Matmul helper
-  const matmul = (A,B) => A.map(row => B[0].map((_,j) => row.reduce((s,v,k)=>s+v*B[k][j],0)));
-  const Q = matmul(X, W_Q); // T × d_model
-  const K = matmul(X, W_K);
-
-  // Build display HTML
-  const container = document.getElementById('qkv-display');
-  const tokenLabels = ['Token 0', 'Token 1', 'Token 2', 'Token 3'];
-  const colors = ['#1a3a6b','#8b6914','#1a5c3a','#6b1a1a'];
-
-  let html = '';
-
-  // For each head, show score matrix
-  for(let h=0;h<heads;h++) {
-    const start = h * d_head, end = start + d_head;
-    // Slice Q,K to this head
-    const Qh = Q.map(row => row.slice(start,end));
-    const Kh = K.map(row => row.slice(start,end));
-    // Score matrix T×T
-    const scale = Math.sqrt(d_head);
-    const scores = Qh.map((q,i) => Kh.map((k,j) => {
-      const raw = q.reduce((s,v,di)=>s+v*k[di],0) / scale;
-      return j > i ? null : raw; // causal mask
-    }));
-    const allScores = scores.flat().filter(v=>v!==null);
-    const minS=Math.min(...allScores), maxS=Math.max(...allScores);
-
-    html += `<div style="background:var(--paper2);border:1px solid var(--rule);padding:14px;">`;
-    html += `<div style="font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">Head ${h+1} — scores Q·Kᵀ/√${d_head.toFixed(0)}</div>`;
-    html += `<div style="display:grid;grid-template-columns:repeat(${T+1},1fr);gap:2px;">`;
-    // Header row
-    html += `<div></div>`;
-    for(let j=0;j<T;j++) html += `<div style="font-family:var(--mono);font-size:8px;color:var(--muted);text-align:center;padding:2px 0;">T${j}</div>`;
-    // Score rows
-    for(let i=0;i<T;i++) {
-      html += `<div style="font-family:var(--mono);font-size:8px;color:var(--muted);display:flex;align-items:center;padding-right:3px;">T${i}</div>`;
-      for(let j=0;j<T;j++) {
-        const v = scores[i][j];
-        if(v===null) {
-          html += `<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05);padding:4px 2px;text-align:center;font-family:var(--mono);font-size:8px;color:rgba(255,255,255,0.12);">×</div>`;
-        } else {
-          const norm = (v-minS)/(maxS-minS+0.001);
-          const r2=Math.round(10+norm*30),g2=Math.round(20+norm*150),b2=Math.round(80+norm*120);
-          html += `<div style="background:rgb(${r2},${g2},${b2});padding:4px 2px;text-align:center;font-family:var(--mono);font-size:8px;color:${norm>0.45?'rgba(0,0,0,0.8)':'rgba(255,255,255,0.7)'};">${v.toFixed(1)}</div>`;
-        }
-      }
+function initAttnFlow() {
+  // Generate plausible attention weights with fixed seed
+  const rng = seededRand(77);
+  const T = ATTN_SENTENCE.length;
+  attnWeights = [];
+  for(let i=0;i<T;i++) {
+    const row = new Array(T).fill(0);
+    let sum = 0;
+    for(let j=0;j<=i;j++) {
+      // simulate: nearby words attend more, but "mat" strongly attends to "cat" and "sat"
+      let base = Math.exp(-(i-j)*0.4) * (0.5 + rng()*1.2);
+      if(ATTN_SENTENCE[i]==='mat' && (ATTN_SENTENCE[j]==='cat'||ATTN_SENTENCE[j]==='sat')) base *= 3.5;
+      if(ATTN_SENTENCE[i]==='on' && ATTN_SENTENCE[j]==='sat') base *= 2.5;
+      if(ATTN_SENTENCE[i]==='sat' && ATTN_SENTENCE[j]==='cat') base *= 2.8;
+      row[j] = base; sum += base;
     }
-    html += `</div></div>`;
+    for(let j=0;j<=i;j++) row[j] /= sum;
+    attnWeights.push(row);
   }
-
-  // Also show Q vector for token 0 as a bar chart
-  html += `<div style="background:var(--paper2);border:1px solid var(--rule);padding:14px;grid-column:1/-1;">`;
-  html += `<div style="font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">Q vector for each token (all ${d_model} dims)</div>`;
-  html += `<div style="display:flex;flex-direction:column;gap:5px;">`;
-  Q.forEach((q,ti) => {
-    const maxAbs = Math.max(...q.map(Math.abs), 0.01);
-    html += `<div style="display:flex;align-items:center;gap:8px;">`;
-    html += `<span style="font-family:var(--mono);font-size:9px;color:${colors[ti]};width:44px;flex-shrink:0;">Token ${ti}</span>`;
-    html += `<div style="flex:1;display:flex;gap:1px;align-items:center;">`;
-    q.forEach(v => {
-      const pct = Math.abs(v)/maxAbs*100;
-      html += `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;">
-        <div style="width:100%;height:${v>0?Math.round(pct*0.2):1}px;background:${colors[ti]};opacity:0.8;"></div>
-        <div style="width:1px;height:2px;background:var(--rule);"></div>
-        <div style="width:100%;height:${v<0?Math.round(pct*0.2):1}px;background:var(--red);opacity:0.6;"></div>
-      </div>`;
-    });
-    html += `</div></div>`;
-  });
-  html += `</div></div>`;
-
-  container.innerHTML = html;
-  container.style.gridTemplateColumns = heads <= 2 ? '1fr 1fr' : '1fr 1fr';
+  renderAttnTokens();
+  renderAttnFlow();
 }
 
-function drawAttention(){
-  const text=document.getElementById('tf-text')?.value||'the cat sat';
-  const tokens=text.trim().split(/\s+/).filter(t=>t.length>0);
-  const n=Math.min(tokens.length,10);
-  if(n<1)return;
-
-  const c=document.getElementById('attn-canvas');
-  const dpr=window.devicePixelRatio||1;
-  const availW=c.parentElement.offsetWidth||500;
-  const cell=Math.min(Math.floor(availW/(n+1.5)),56);
-  const labelW=cell*1.4;
-  const cssW=labelW+(n*cell)+4;
-  const cssH=labelW+(n*cell)+4;
-
-  c.style.width=cssW+'px'; c.style.height=cssH+'px';
-  c.width=cssW*dpr; c.height=cssH*dpr;
-  const x=c.getContext('2d');
-  x.scale(dpr,dpr);
-
-  // Dark background
-  x.fillStyle='#0f0f14'; x.fillRect(0,0,cssW,cssH);
-
-  // Generate causal attention matrix
-  const attn=[];
-  for(let i=0;i<n;i++){
-    const row=new Array(n).fill(0); let sum=0;
-    for(let j=0;j<=i;j++){const v=Math.exp(-(i-j)*0.55)*(0.5+Math.random()*0.9);row[j]=v;sum+=v;}
-    for(let j=0;j<=i;j++) row[j]/=sum;
-    attn.push(row);
-  }
-
-  const off=labelW;
-
-  // Column headers
-  x.font=`${Math.max(9,cell/4.5)}px IBM Plex Mono`;
-  x.textAlign='center'; x.textBaseline='middle';
-  tokens.slice(0,n).forEach((t,j)=>{
-    x.fillStyle='rgba(180,180,200,0.7)';
-    x.fillText(t.slice(0,7), off+j*cell+cell/2, labelW/2);
-  });
-  // Row headers
-  tokens.slice(0,n).forEach((t,i)=>{
-    x.fillStyle='rgba(180,180,200,0.7)';
-    x.textAlign='right'; x.textBaseline='middle';
-    x.fillText(t.slice(0,7), labelW-6, off+i*cell+cell/2);
-  });
-
-  // Cells
-  x.textAlign='center'; x.textBaseline='middle';
-  for(let i=0;i<n;i++) for(let j=0;j<n;j++){
-    const cx=off+j*cell, cy=off+i*cell;
-    if(j>i){
-      // Masked — very dark
-      x.fillStyle='rgba(255,255,255,0.03)'; x.fillRect(cx,cy,cell,cell);
-      x.fillStyle='rgba(255,255,255,0.06)';
-      x.font=`${Math.max(8,cell/5.5)}px IBM Plex Mono`;
-      x.fillText('×', cx+cell/2, cy+cell/2);
-    } else {
-      const v=attn[i][j];
-      // Color: low = dark navy, high = bright gold/white
-      const r2=Math.round(10+v*50), g2=Math.round(20+v*160), b2=Math.round(80+v*140);
-      x.fillStyle=`rgb(${r2},${g2},${b2})`; x.fillRect(cx,cy,cell,cell);
-      // Percentage text
-      x.font=`${Math.max(8,cell/5)}px IBM Plex Mono`;
-      x.fillStyle=v>0.35?'rgba(0,0,0,0.85)':'rgba(255,255,255,0.6)';
-      x.fillText((v*100).toFixed(0)+'%', cx+cell/2, cy+cell/2);
-    }
-    // Grid line
-    x.strokeStyle='rgba(255,255,255,0.04)'; x.lineWidth=0.5;
-    x.strokeRect(cx,cy,cell,cell);
-  }
-
-  // Diagonal label
-  x.font=`8px IBM Plex Mono`;
-  x.fillStyle='rgba(100,100,130,0.5)';
-  x.textAlign='center';
-  x.fillText('← masked (future)', off+n*cell*0.7, off+cell*0.4);
+function renderAttnTokens() {
+  const T = ATTN_SENTENCE.length;
+  const el = document.getElementById('attn-sentence');
+  if(!el) return;
+  el.innerHTML = ATTN_SENTENCE.map((w,i) => `
+    <button onclick="selectAttnToken(${i})" style="
+      font-family:var(--serif);font-size:1.15rem;font-weight:600;
+      padding:8px 16px;border:2px solid ${i===attnSelected?'var(--ink)':'var(--rule)'};
+      background:${i===attnSelected?'var(--ink)':'var(--paper2)'};
+      color:${i===attnSelected?'var(--paper)':'var(--ink)'};
+      cursor:pointer;transition:all 0.15s;letter-spacing:0.5px;
+    ">${w}</button>`).join('');
 }
-setTimeout(drawAttention,200);
+
+function selectAttnToken(i) {
+  attnSelected = i;
+  renderAttnTokens();
+  renderAttnFlow();
+}
+
+function renderAttnFlow() {
+  const c = document.getElementById('attn-flow-canvas');
+  if(!c) return;
+  const dpr = window.devicePixelRatio || 1;
+  const T = ATTN_SENTENCE.length;
+  const cssW = c.parentElement.offsetWidth || 500;
+  const cssH = 120;
+  c.style.width = cssW + 'px'; c.style.height = cssH + 'px';
+  c.width = cssW * dpr; c.height = cssH * dpr;
+  const ctx = c.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  ctx.fillStyle = '#0f0f14'; ctx.fillRect(0,0,cssW,cssH);
+
+  const slotW = cssW / T;
+  const tokenY = 80;
+  const fromY = 30;
+
+  const row = attnWeights[attnSelected];
+  const maxW = Math.max(...row);
+
+  // Draw arcs from selected → each attended token
+  for(let j=0;j<=attnSelected;j++) {
+    const w = row[j];
+    const alpha = 0.1 + (w/maxW)*0.85;
+    const lineW = 1 + (w/maxW)*6;
+    const fromX = (attnSelected+0.5)*slotW;
+    const toX = (j+0.5)*slotW;
+
+    ctx.beginPath();
+    ctx.strokeStyle = `rgba(80,180,220,${alpha})`;
+    ctx.lineWidth = lineW;
+    // Arc above the tokens
+    const mx = (fromX+toX)/2;
+    const arcH = 30 + Math.abs(fromX-toX)*0.25;
+    ctx.moveTo(fromX, tokenY);
+    ctx.quadraticCurveTo(mx, tokenY-arcH, toX, tokenY);
+    ctx.stroke();
+
+    // Dot at destination
+    ctx.beginPath();
+    ctx.arc(toX, tokenY, 4 + (w/maxW)*4, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(80,180,220,${0.3 + (w/maxW)*0.7})`;
+    ctx.fill();
+  }
+
+  // Draw selected token highlight
+  const selX = (attnSelected+0.5)*slotW;
+  ctx.beginPath();
+  ctx.arc(selX, tokenY, 10, 0, Math.PI*2);
+  ctx.fillStyle = 'rgba(255,255,255,0.15)';
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(selX, tokenY, 10, 0, Math.PI*2);
+  ctx.strokeStyle = 'rgba(255,255,255,0.6)';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  // Word labels
+  ctx.font = `11px IBM Plex Mono`;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  ATTN_SENTENCE.forEach((w,i) => {
+    const x = (i+0.5)*slotW;
+    const isSelected = i===attnSelected;
+    const attnStrength = i<=attnSelected ? row[i]/maxW : 0;
+    ctx.fillStyle = isSelected ? 'rgba(255,255,255,0.9)' : `rgba(${Math.round(80+attnStrength*150)},${Math.round(180+attnStrength*40)},${Math.round(220-attnStrength*80)},${0.4+attnStrength*0.6})`;
+    ctx.font = isSelected ? 'bold 11px IBM Plex Mono' : '11px IBM Plex Mono';
+    ctx.fillText(w, x, tokenY+14);
+    // Attention % for visible tokens
+    if(i<=attnSelected && !isSelected) {
+      ctx.fillStyle = 'rgba(160,160,180,0.5)';
+      ctx.font = '9px IBM Plex Mono';
+      ctx.fillText((row[i]*100).toFixed(0)+'%', x, tokenY+27);
+    }
+  });
+
+  // Future tokens dimmed with lock
+  ctx.font = '9px IBM Plex Mono'; ctx.fillStyle = 'rgba(100,100,120,0.4)';
+  for(let j=attnSelected+1;j<T;j++) {
+    ctx.fillText('masked', (j+0.5)*slotW, tokenY+14);
+  }
+
+  // Update label
+  const top2 = [...row.entries()].filter(([j])=>j<=attnSelected).sort((a,b)=>b[1]-a[1]).slice(0,2);
+  const lbl = document.getElementById('attn-flow-label');
+  if(lbl) {
+    const word = ATTN_SENTENCE[attnSelected];
+    const t1 = top2[0], t2 = top2[1];
+    lbl.innerHTML = `<strong>"${word}"</strong> attends most to <strong>"${ATTN_SENTENCE[t1[0]]}"</strong> (${(t1[1]*100).toFixed(0)}%)${t2?` and <strong>"${ATTN_SENTENCE[t2[0]]}"</strong> (${(t2[1]*100).toFixed(0)}%)`:''}`;
+  }
+}
+
+function renderAttnFlow() {
+  const c = document.getElementById('attn-flow-canvas');
+  if(!c) return;
+  const dpr = window.devicePixelRatio || 1;
+  const T = ATTN_SENTENCE.length;
+  const cssW = c.parentElement.offsetWidth || 500;
+  const cssH = 130;
+  // Set actual pixel dimensions — don't touch style.width so CSS keeps it 100%
+  c.width = cssW * dpr;
+  c.height = cssH * dpr;
+  c.style.height = cssH + 'px';
+  const ctx = c.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  ctx.fillStyle = '#0f0f14'; ctx.fillRect(0,0,cssW,cssH);
+
+  const slotW = cssW / T;
+  const tokenY = 80;
+
+  const row = attnWeights[attnSelected];
+  const maxW = Math.max(...row);
+
+  for(let j=0;j<=attnSelected;j++) {
+    const w = row[j];
+    const alpha = 0.1 + (w/maxW)*0.85;
+    const lineW = 1 + (w/maxW)*6;
+    const fromX = (attnSelected+0.5)*slotW;
+    const toX = (j+0.5)*slotW;
+    const mx = (fromX+toX)/2;
+    const arcH = 28 + Math.abs(fromX-toX)*0.22;
+    ctx.beginPath();
+    ctx.strokeStyle = `rgba(80,180,220,${alpha})`;
+    ctx.lineWidth = lineW;
+    ctx.moveTo(fromX, tokenY);
+    ctx.quadraticCurveTo(mx, tokenY-arcH, toX, tokenY);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(toX, tokenY, 4 + (w/maxW)*4, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(80,180,220,${0.3 + (w/maxW)*0.7})`;
+    ctx.fill();
+  }
+
+  const selX = (attnSelected+0.5)*slotW;
+  ctx.beginPath(); ctx.arc(selX, tokenY, 10, 0, Math.PI*2);
+  ctx.fillStyle = 'rgba(255,255,255,0.15)'; ctx.fill();
+  ctx.beginPath(); ctx.arc(selX, tokenY, 10, 0, Math.PI*2);
+  ctx.strokeStyle = 'rgba(255,255,255,0.6)'; ctx.lineWidth=1.5; ctx.stroke();
+
+  ctx.textAlign='center'; ctx.textBaseline='top';
+  ATTN_SENTENCE.forEach((w,i) => {
+    const x = (i+0.5)*slotW;
+    const isSelected = i===attnSelected;
+    const attnStrength = i<=attnSelected ? row[i]/maxW : 0;
+    ctx.fillStyle = isSelected ? 'rgba(255,255,255,0.95)'
+      : i>attnSelected ? 'rgba(100,100,120,0.4)'
+      : `rgba(${Math.round(80+attnStrength*150)},${Math.round(180+attnStrength*40)},${Math.round(220-attnStrength*80)},${0.4+attnStrength*0.55})`;
+    ctx.font = isSelected ? 'bold 11px IBM Plex Mono' : '11px IBM Plex Mono';
+    ctx.fillText(w, x, tokenY+14);
+    if(i<=attnSelected && !isSelected) {
+      ctx.fillStyle='rgba(160,160,180,0.5)';
+      ctx.font='9px IBM Plex Mono';
+      ctx.fillText((row[i]*100).toFixed(0)+'%', x, tokenY+27);
+    }
+    if(i>attnSelected) {
+      ctx.fillStyle='rgba(90,90,110,0.4)';
+      ctx.font='8px IBM Plex Mono';
+      ctx.fillText('masked', x, tokenY+27);
+    }
+  });
+
+  const top2 = [...row.entries()].filter(([j])=>j<=attnSelected).sort((a,b)=>b[1]-a[1]).slice(0,2);
+  const lbl = document.getElementById('attn-flow-label');
+  if(lbl && top2.length) {
+    const word = ATTN_SENTENCE[attnSelected];
+    const t1=top2[0], t2=top2[1];
+    lbl.innerHTML = `<strong>"${word}"</strong> attends most to <strong>"${ATTN_SENTENCE[t1[0]]}"</strong> (${(t1[1]*100).toFixed(0)}%)${t2?` and <strong>"${ATTN_SENTENCE[t2[0]]}"</strong> (${(t2[1]*100).toFixed(0)}%)`:''}`;
+  }
+}
+
+// ===== NEXT WORD PREDICTION =====
+const NEXT_WORD_DATA = [
+  {
+    prompt: "The cat sat on the",
+    predictions: [
+      {word:"mat", pct:41}, {word:"floor", pct:18}, {word:"bed", pct:12},
+      {word:"couch", pct:9}, {word:"chair", pct:7}, {word:"roof", pct:4}
+    ]
+  },
+  {
+    prompt: "The capital of France is",
+    predictions: [
+      {word:"Paris", pct:72}, {word:"Lyon", pct:8}, {word:"Marseille", pct:5},
+      {word:"located", pct:4}, {word:"known", pct:3}, {word:"home", pct:2}
+    ]
+  },
+  {
+    prompt: "She opened her laptop and",
+    predictions: [
+      {word:"started", pct:28}, {word:"began", pct:22}, {word:"typed", pct:17},
+      {word:"opened", pct:11}, {word:"looked", pct:8}, {word:"saw", pct:5}
+    ]
+  },
+  {
+    prompt: "The neural network was trained on",
+    predictions: [
+      {word:"a", pct:34}, {word:"the", pct:24}, {word:"large", pct:14},
+      {word:"millions", pct:9}, {word:"data", pct:7}, {word:"thousands", pct:4}
+    ]
+  },
+  {
+    prompt: "Once upon a time, there was",
+    predictions: [
+      {word:"a", pct:52}, {word:"an", pct:19}, {word:"no", pct:8},
+      {word:"once", pct:5}, {word:"nothing", pct:4}, {word:"the", pct:3}
+    ]
+  }
+];
+
+let selectedPrompt = 0;
+
+function initNextWord() {
+  const chips = document.getElementById('prompt-chips');
+  if(!chips) return;
+  chips.innerHTML = NEXT_WORD_DATA.map((d,i)=>`
+    <button onclick="selectPrompt(${i})" style="
+      font-family:var(--mono);font-size:11px;padding:6px 12px;
+      border:1px solid ${i===selectedPrompt?'var(--ink)':'var(--rule)'};
+      background:${i===selectedPrompt?'var(--ink)':'var(--paper2)'};
+      color:${i===selectedPrompt?'var(--paper)':'var(--muted)'};
+      cursor:pointer;transition:all 0.15s;
+    ">${d.prompt.split(' ').slice(-2).join(' ')}…</button>`).join('');
+  renderNextWord();
+}
+
+function selectPrompt(i) {
+  selectedPrompt = i;
+  initNextWord();
+}
+
+function renderNextWord() {
+  const d = NEXT_WORD_DATA[selectedPrompt];
+  const promptEl = document.getElementById('prompt-text');
+  if(promptEl) promptEl.textContent = d.prompt + ' ___';
+  const bars = document.getElementById('next-word-bars');
+  if(!bars) return;
+  bars.innerHTML = d.predictions.map((p,i)=>`
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+      <span style="font-family:var(--serif);font-size:${i===0?'1.2rem':'1rem'};font-weight:${i===0?700:400};color:${i===0?'var(--ink)':'var(--muted)'};width:110px;flex-shrink:0;">${p.word}</span>
+      <div style="flex:1;background:var(--paper2);height:${i===0?14:10}px;border:1px solid var(--rule);">
+        <div style="width:${p.pct}%;height:100%;background:${i===0?'var(--ink)':'rgba(26,58,107,0.35)'};transition:width 0.4s ease;"></div>
+      </div>
+      <span style="font-family:var(--mono);font-size:11px;color:${i===0?'var(--ink)':'var(--muted)'};width:36px;text-align:right;flex-shrink:0;">${p.pct}%</span>
+    </div>`).join('');
+}
 setTimeout(drawPosEncoding,200);
-setTimeout(drawQKV,200);
+setTimeout(initAttnFlow,200);
+setTimeout(initNextWord,200);
 
 // ===== PLACEMENT =====
 function predictPlacement(){
@@ -1693,7 +2084,7 @@ function updateSleep(){
   if(fat>=4) insight='Fatigue is the dominant negative predictor in this model. Improving sleep quality may reduce its impact more than extending duration.';
   else if(miss>=3) insight='Missed classes have the strongest measurable negative effect — consistent attendance matters more than sleep duration alone.';
   else if(stress>=4) insight='High stress reduces performance independently of sleep. The model captures this through the stress coefficient.';
-  else if(sleep>=8&&stress<=2) insight='Low stress and adequate sleep put you in the model\'s high-performance region. Maintain consistency.';
+  else if(sleep>=8&&stress<=2) insight='Low stress and adequate sleep place this profile in the model\'s high-performance region.';
   else insight='Profile is balanced. The key drivers are fatigue, missed classes, and stress — not sleep duration alone.';
   document.getElementById('sl-insight').textContent=insight;
 
@@ -1788,7 +2179,10 @@ function drawWifiChart(curH,type){
 predictPlacement();
 updateGraph();
 initXOR();
+resetGD();
 updateSleep();
+setTimeout(drawActivations, 100);
+setTimeout(setupActivHover, 150);
 setTimeout(()=>{updateWifi();},100);
 ensureWeights(); // pre-fetch MNIST weights in background
 </script>

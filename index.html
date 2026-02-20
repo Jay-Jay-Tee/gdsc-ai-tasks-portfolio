@@ -136,6 +136,7 @@ body {
   margin-top: 8px;
   max-width: 680px;
   font-weight: 300;
+  font-family: var(--sans);
 }
 
 /* METRICS ROW */
@@ -175,6 +176,14 @@ body {
   border: 1px solid var(--rule);
   padding: 28px 32px;
   margin-bottom: 24px;
+}
+.demo-card p {
+  font-size: 12px;
+  color: var(--muted);
+  font-family: var(--mono);
+  line-height: 1.9;
+  margin: 0;
+  font-weight: 400;
 }
 .demo-card-title {
   font-family: var(--mono);
@@ -239,7 +248,7 @@ label {
 .mnist-layout {
   display: grid;
   grid-template-columns: 300px 1fr;
-  gap: 24px;
+  gap: 28px;
   align-items: start;
 }
 .canvas-wrap {
@@ -282,7 +291,7 @@ label {
 /* Neural network visualization */
 #nn-viz {
   width: 100%;
-  height: 320px;
+  height: 360px;
 }
 
 /* Prediction */
@@ -561,6 +570,7 @@ label {
     <div class="demo-card-title">How it works</div>
     <p style="font-size:12px;color:var(--muted);font-family:var(--mono);line-height:1.9;margin:0;">Each 28×28 greyscale image is flattened into a vector of 784 pixel values and fed into a feedforward network. The first layer projects this into 128 neurons and applies ReLU — zeroing out negative activations. The second layer maps those 128 values to 10 output scores (one per digit class). The class with the highest score is the prediction. Training minimises cross-entropy loss using Adam: an optimiser that adapts the learning rate per-parameter based on a running estimate of gradient magnitude. After 5 epochs over 60,000 training images, the network reaches 97.16% accuracy on unseen test data.</p>
   </div>
+  <div class="demo-card">
     <div class="demo-card-title">Interactive Inference — Draw a digit</div>
     <div class="mnist-note">
       Weights loaded from a trained PyTorch model (97.16% test accuracy). Drawing is preprocessed to match MNIST format: bounding box cropped, scaled to 20×20, centered in 28×28, then normalized with <code>Normalize((0.5,),(0.5,))</code>.
@@ -582,7 +592,7 @@ label {
           <div style="font-size:22px;color:var(--muted);padding-top:50px;">→</div>
           <div style="flex:1;">
             <div class="viz-step-label">Layer activations</div>
-            <canvas id="nn-viz" height="320" style="width:100%;display:block;border:1px solid #2a2a3a;background:#0f0f14;border-radius:4px;"></canvas>
+            <canvas id="nn-viz" height="360" style="width:100%;display:block;border:1px solid #2a2a3a;background:#0f0f14;border-radius:4px;"></canvas>
           </div>
         </div>
         <div id="pred-display" style="display:none;">
@@ -646,7 +656,7 @@ label {
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
       <div>
         <div style="font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Weight over time</div>
-        <canvas id="gd-canvas" width="300" height="160" style="width:100%;border:1px solid var(--rule);background:#fff;display:block;"></canvas>
+        <canvas id="gd-canvas" width="300" height="200" style="width:100%;border:1px solid var(--rule);background:#fff;display:block;"></canvas>
       </div>
       <div style="font-family:var(--mono);font-size:12px;padding:12px;background:var(--paper2);border:1px solid var(--rule);">
         <div style="margin-bottom:8px;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);">Current state</div>
@@ -659,7 +669,7 @@ label {
     <div class="demo-card-title">tanh vs ReLU — activation functions</div>
     <p style="font-size:12px;color:var(--muted);font-family:var(--mono);margin-bottom:16px;line-height:1.8;">The <code>Value</code> class implements both <code>tanh</code> and <code>relu</code>. The <code>Neuron</code> class uses <code>tanh</code> by default. Activations are what make neural networks non-linear — without them, stacking layers is mathematically equivalent to a single linear transformation. Hover over the chart to see exact values and derivatives.</p>
     <div style="overflow:hidden;border:1px solid var(--rule);">
-      <canvas id="activ-canvas" style="display:block;width:100%;cursor:crosshair;" height="180"></canvas>
+      <canvas id="activ-canvas" style="display:block;width:100%;cursor:crosshair;" height="220"></canvas>
     </div>
     <div id="activ-label" style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:8px;min-height:18px;text-align:center;"></div>
     <div style="display:flex;gap:20px;margin-top:10px;font-family:var(--mono);font-size:11px;color:var(--muted);flex-wrap:wrap;">
@@ -679,11 +689,11 @@ label {
     <div style="display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;">
       <div>
         <div style="font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">Decision Boundary</div>
-        <canvas id="xor-canvas" width="280" height="280" style="border:1px solid var(--rule);display:block;width:280px;height:280px;"></canvas>
+        <canvas id="xor-canvas" width="300" height="300" style="border:1px solid var(--rule);display:block;width:300px;height:300px;"></canvas>
       </div>
       <div style="flex:1;min-width:200px;">
         <div style="font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">Training Loss (MSE)</div>
-        <canvas id="loss-canvas" width="400" height="160" style="display:block;width:100%;border:1px solid var(--rule);background:#fff;"></canvas>
+        <canvas id="loss-canvas" width="400" height="200" style="display:block;width:100%;border:1px solid var(--rule);background:#fff;"></canvas>
         <div id="training-log"></div>
         <div style="margin-top:12px;padding:12px 14px;background:var(--paper2);border-left:3px solid var(--ink);font-family:var(--mono);font-size:11px;color:var(--muted);line-height:2;">
           Loss function: <code>L = mean((y_pred − y_true)²)</code><br>
@@ -919,7 +929,7 @@ label {
       <div class="wifi-metric"><div class="wifi-metric-val" id="wf-rec">—</div><div class="wifi-metric-lbl">Recommendation</div></div>
       <div class="wifi-metric"><div class="wifi-metric-val" id="wf-type2">—</div><div class="wifi-metric-lbl">Interpretation</div></div>
     </div>
-    <canvas id="wifi-chart" height="140"></canvas>
+    <canvas id="wifi-chart" height="200"></canvas>
   </div>
 </div>
 
@@ -1322,7 +1332,7 @@ function renderGD() {
   const c = document.getElementById('gd-canvas');
   if(!c) return;
   const dpr = window.devicePixelRatio||1;
-  const cssW = c.parentElement.offsetWidth||300, cssH = 160;
+  const cssW = c.parentElement.offsetWidth||300, cssH = 200;
   c.width=cssW*dpr; c.height=cssH*dpr; c.style.width=cssW+'px'; c.style.height=cssH+'px';
   const ctx=c.getContext('2d'); ctx.scale(dpr,dpr);
   const W=cssW, H=cssH, pad={l:36,r:12,t:12,b:24};
@@ -1386,7 +1396,7 @@ function drawActivations() {
   const c = document.getElementById('activ-canvas');
   if(!c) return;
   const dpr=window.devicePixelRatio||1;
-  const cssW=c.parentElement.offsetWidth||500, cssH=180;
+  const cssW=c.parentElement.offsetWidth||500, cssH=220;
   c.width=cssW*dpr; c.height=cssH*dpr; c.style.width=cssW+'px'; c.style.height=cssH+'px';
   const ctx=c.getContext('2d'); ctx.scale(dpr,dpr);
   const W=cssW, H=cssH, pad={l:36,r:16,t:14,b:24};
@@ -1761,7 +1771,7 @@ function renderAttnFlow() {
   const dpr = window.devicePixelRatio || 1;
   const T = ATTN_SENTENCE.length;
   const cssW = c.parentElement.offsetWidth || 500;
-  const cssH = 120;
+  const cssH = 160;
   c.style.width = cssW + 'px'; c.style.height = cssH + 'px';
   c.width = cssW * dpr; c.height = cssH * dpr;
   const ctx = c.getContext('2d');
@@ -1853,7 +1863,7 @@ function renderAttnFlow() {
   const dpr = window.devicePixelRatio || 1;
   const T = ATTN_SENTENCE.length;
   const cssW = c.parentElement.offsetWidth || 500;
-  const cssH = 130;
+  const cssH = 160;
   // Set actual pixel dimensions — don't touch style.width so CSS keeps it 100%
   c.width = cssW * dpr;
   c.height = cssH * dpr;
@@ -2132,11 +2142,11 @@ function updateWifi(){
 
 function drawWifiChart(curH,type){
   const c=document.getElementById('wifi-chart');
-  const W=c.parentElement.offsetWidth||600; c.width=W; c.height=140;
+  const W=c.parentElement.offsetWidth||600; c.width=W; c.height=200;
   const ctx2=c.getContext('2d');
-  const H=140;
+  const H=200;
   ctx2.clearRect(0,0,W,H); ctx2.fillStyle='#fff'; ctx2.fillRect(0,0,W,H);
-  const pad={l:48,r:12,t:12,b:28};
+  const pad={l:48,r:12,t:16,b:32};
   const iW=W-pad.l-pad.r, iH=H-pad.t-pad.b;
   const rates=Array.from({length:24},(_,h)=>getPredRate(h,type));
   const max=Math.max(...rates);

@@ -288,48 +288,50 @@ label {
 /* Prediction */
 #pred-display {
   display: flex;
-  align-items: center;
-  gap: 20px;
-  padding: 16px 0;
-  border-top: 1px solid var(--rule);
-  margin-top: 16px;
+  flex-direction: column;
+  margin-top: 20px;
 }
 #pred-digit-big {
   font-family: var(--serif);
-  font-size: 4rem;
+  font-size: 5.5rem;
   font-weight: 700;
   color: var(--ink);
-  width: 70px;
-  text-align: center;
+  line-height: 1;
+  padding: 0 0 16px;
+  border-bottom: 2px solid var(--ink);
+  margin-bottom: 18px;
 }
-.prob-bars { flex: 1; }
+.prob-bars { width: 100%; }
 .prob-row {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 3px;
+  gap: 10px;
+  margin-bottom: 6px;
+  padding: 2px 0;
 }
-.prob-d { font-family: var(--mono); font-size: 10px; color: var(--muted); width: 12px; text-align: right; }
-.prob-bar-bg { flex: 1; background: var(--paper2); height: 6px; }
-.prob-bar-fg { height: 100%; background: var(--ink); transition: width 0.4s ease; }
+.prob-d { font-family: var(--mono); font-size: 13px; font-weight: 500; color: var(--ink); width: 16px; text-align: right; flex-shrink: 0; }
+.prob-bar-bg { flex: 1; background: var(--paper2); height: 11px; border: 1px solid var(--rule); }
+.prob-bar-fg { height: 100%; background: var(--ink); transition: width 0.45s cubic-bezier(0.4,0,0.2,1); }
 .prob-bar-fg.top { background: var(--blue); }
-.prob-pct { font-family: var(--mono); font-size: 10px; color: var(--muted); width: 36px; }
+.prob-pct { font-family: var(--mono); font-size: 11px; color: var(--muted); width: 42px; text-align: right; flex-shrink: 0; }
+.prob-row.winner .prob-d { color: var(--blue); }
+.prob-row.winner .prob-pct { color: var(--blue); font-weight: 500; }
 
 /* Viz steps */
 .viz-steps {
   display: flex;
-  gap: 12px;
+  gap: 14px;
   align-items: flex-start;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   flex-wrap: wrap;
 }
 .viz-step-label {
   font-family: var(--mono);
   font-size: 9px;
-  letter-spacing: 1px;
+  letter-spacing: 2px;
   color: var(--muted);
   text-transform: uppercase;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
 /* ============ MICROGRAD ============ */
@@ -553,22 +555,24 @@ label {
 
   <div class="demo-card">
     <div class="demo-card-title">Interactive Inference — Draw a digit</div>
+    <div class="mnist-note">
+      Weights loaded from your trained PyTorch model (97.16% test accuracy). Drawing is preprocessed to match MNIST: bounding box cropped, scaled to 20×20, centered in 28×28, then normalized with <code>Normalize((0.5,),(0.5,))</code>.
+    </div>
     <div class="mnist-layout">
       <div class="canvas-wrap">
         <canvas id="draw-canvas" width="280" height="280"></canvas>
         <div class="btn-row">
           <button class="btn" onclick="runInference()">Run →</button>
           <button class="btn secondary" onclick="clearCanvas()">Clear</button>
-          <button class="btn secondary" onclick="skipAnimation()">Skip anim</button>
         </div>
       </div>
       <div class="mnist-right">
         <div class="viz-steps" id="viz-steps" style="display:none;">
           <div>
             <div class="viz-step-label">28×28 input</div>
-            <canvas id="pixel-canvas" width="28" height="28" style="width:84px;height:84px;image-rendering:pixelated;border:1px solid var(--rule);"></canvas>
+            <canvas id="pixel-canvas" width="28" height="28" style="width:112px;height:112px;image-rendering:pixelated;border:1px solid var(--rule);"></canvas>
           </div>
-          <div style="font-size:22px;color:var(--muted);padding-top:30px;">→</div>
+          <div style="font-size:22px;color:var(--muted);padding-top:50px;">→</div>
           <div style="flex:1;">
             <div class="viz-step-label">Layer activations</div>
             <canvas id="nn-viz" height="220" style="width:100%;display:block;border:1px solid #2a2a3a;background:#0f0f14;border-radius:4px;"></canvas>
@@ -677,10 +681,45 @@ label {
   </div>
 
   <div class="demo-card">
+    <div class="demo-card-title">Positional Encoding — from your positional.py</div>
+    <p style="font-size:12px;color:var(--muted);font-family:var(--mono);margin-bottom:16px;line-height:1.7;">Your <code>PositionalEncoding</code> class adds a learned embedding to each token position. The heatmap below shows <code>pos_embedding[:T]</code> — each row is one token position, each column is one dimension. This is what gets added to token embeddings before the first Transformer block.</p>
+    <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:14px;">
+      <div style="flex:1;min-width:160px;">
+        <label>Sequence length T</label>
+        <input type="range" min="4" max="20" value="10" id="pos-T" oninput="drawPosEncoding()">
+      </div>
+      <div style="flex:1;min-width:160px;">
+        <label>d_model (shown: first <span id="pos-d-lbl">32</span> dims)</label>
+        <input type="range" min="8" max="64" step="8" value="32" id="pos-d" oninput="drawPosEncoding()">
+      </div>
+      <span style="font-family:var(--mono);font-size:11px;color:var(--muted);">T = <strong id="pos-T-lbl">10</strong></span>
+    </div>
+    <canvas id="pos-canvas" style="display:block;width:100%;border:1px solid #2a2a3a;border-radius:4px;"></canvas>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:8px;">Dark = negative value, light = positive value. Each row is added to the corresponding token embedding: <code>X = token_embeddings + pos_embedding[:T]</code></div>
+  </div>
+
+  <div class="demo-card">
+    <div class="demo-card-title">Q / K / V Projections — from your multi.py</div>
+    <p style="font-size:12px;color:var(--muted);font-family:var(--mono);margin-bottom:16px;line-height:1.7;">Your <code>MultiHeadSelfAttention.forward()</code> computes <code>Q = X @ W_Q</code>, <code>K = X @ W_K</code>, <code>V = X @ W_V</code>. Each token gets its own Q, K, V vector. Below shows the first 2 tokens' Q and K vectors for a 4-head, 8-dim model — and the resulting raw attention score <code>Q·Kᵀ / √d_head</code> before masking.</p>
+    <div style="margin-bottom:14px;">
+      <label>Number of attention heads</label>
+      <select id="qkv-heads" onchange="drawQKV()" style="width:auto;display:inline-block;margin-left:8px;">
+        <option value="1">1 head</option>
+        <option value="2" selected>2 heads</option>
+        <option value="4">4 heads</option>
+      </select>
+    </div>
+    <div id="qkv-display" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;flex-wrap:wrap;"></div>
+    <div style="margin-top:16px;padding:14px 16px;background:var(--paper2);border-left:3px solid var(--ink);font-family:var(--mono);font-size:11px;color:var(--muted);line-height:2;">
+      After splitting into heads, your code loops: <code>scores = (q @ k.T) / np.sqrt(d_head)</code> → mask upper triangle → softmax → <code>head_output = attention @ v</code> → concatenate heads → output projection <code>@ W_O</code>
+    </div>
+  </div>
+
+  <div class="demo-card">
     <div class="demo-card-title">Causal Attention Matrix — type a sentence</div>
-    <p style="font-size:12px;color:var(--muted);font-family:var(--mono);margin-bottom:12px;line-height:1.7;">This shows a simulated attention weight matrix. Each cell [i,j] shows how much token i attends to token j. The upper triangle is masked to –∞ (causal: no token can see the future). Darker = higher attention weight.</p>
+    <p style="font-size:12px;color:var(--muted);font-family:var(--mono);margin-bottom:12px;line-height:1.7;">Each cell [i,j] = how much token i attends to token j. Upper triangle masked to −∞ (your code: <code>mask = np.triu(np.ones((T,T)), k=1) * -1e9</code>). Softmax makes each row sum to 1.</p>
     <input type="text" id="tf-text" value="the cat sat on the mat" oninput="drawAttention()" style="margin-bottom:14px;">
-    <canvas id="attn-canvas"></canvas>
+    <canvas id="attn-canvas" style="border-radius:4px;"></canvas>
   </div>
 </div>
 
@@ -809,7 +848,7 @@ function switchTab(id, el) {
   document.querySelectorAll('.index-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('panel-'+id).classList.add('active');
   el.classList.add('active');
-  if(id==='transformer'){ setTimeout(drawAttention,50); }
+  if(id==='transformer'){ setTimeout(()=>{ drawAttention(); drawPosEncoding(); drawQKV(); },50); }
   if(id==='wifi'){ setTimeout(()=>{updateWifi();},50); }
   if(id==='sleep'){ updateSleep(); }
   if(id==='micrograd'){ updateGraph(); initXOR(); }
@@ -1150,7 +1189,7 @@ async function animateNN(px, h, probs) {
 function renderProbBars(probs, pred) {
   const el = document.getElementById('prob-bars');
   el.innerHTML = probs.map((p,i)=>`
-    <div class="prob-row">
+    <div class="prob-row${i===pred?' winner':''}">
       <span class="prob-d">${i}</span>
       <div class="prob-bar-bg"><div class="prob-bar-fg${i===pred?' top':''}" style="width:${(p*100).toFixed(1)}%"></div></div>
       <span class="prob-pct">${(p*100).toFixed(1)}%</span>
@@ -1355,6 +1394,144 @@ function showTFInfo(i) {
   document.getElementById('tf-info-box').innerHTML=`<strong>${info.title}</strong>${info.body}<div class="tf-info-math">${info.math.replace(/\n/g,'<br>')}</div>`;
 }
 
+// ===== POSITIONAL ENCODING VIZ (from positional.py) =====
+function seededRand(seed) {
+  // Simple seeded RNG so the "learned" weights look consistent
+  return function() { seed = (seed * 1664525 + 1013904223) & 0xffffffff; return (seed >>> 0) / 4294967296; };
+}
+
+function drawPosEncoding() {
+  const T = parseInt(document.getElementById('pos-T').value);
+  const d = parseInt(document.getElementById('pos-d').value);
+  document.getElementById('pos-T-lbl').textContent = T;
+  document.getElementById('pos-d-lbl').textContent = d;
+
+  // Simulate learned pos_embedding = np.random.randn(max_len, d_model) with fixed seed
+  const rng = seededRand(42);
+  const emb = Array.from({length:T}, () => Array.from({length:d}, () => (rng()-0.5)*2));
+
+  const c = document.getElementById('pos-canvas');
+  const dpr = window.devicePixelRatio || 1;
+  const cellH = 28, cellW = Math.max(8, Math.floor((c.parentElement.offsetWidth || 500) / d));
+  const cssW = cellW * d, cssH = cellH * T + 24;
+  c.style.width = cssW + 'px'; c.style.height = cssH + 'px';
+  c.width = cssW * dpr; c.height = cssH * dpr;
+  const ctx2 = c.getContext('2d');
+  ctx2.scale(dpr, dpr);
+  ctx2.fillStyle = '#0f0f14'; ctx2.fillRect(0,0,cssW,cssH);
+
+  for(let i=0;i<T;i++) {
+    for(let j=0;j<d;j++) {
+      const v = emb[i][j]; // [-1, 1]
+      const norm = (v + 1) / 2; // [0,1]
+      // dark navy → teal colour map
+      const r2 = Math.round(10 + norm*30), g2 = Math.round(20 + norm*150), b2 = Math.round(80 + norm*120);
+      ctx2.fillStyle = `rgb(${r2},${g2},${b2})`;
+      ctx2.fillRect(j*cellW, i*cellH, cellW-1, cellH-1);
+    }
+    // Row label
+    ctx2.fillStyle = 'rgba(160,160,180,0.7)';
+    ctx2.font = '8px IBM Plex Mono'; ctx2.textAlign = 'right'; ctx2.textBaseline = 'middle';
+    ctx2.fillText('pos '+i, cellW*d-2, i*cellH + cellH/2);
+  }
+  // Bottom axis
+  ctx2.fillStyle = 'rgba(100,100,130,0.6)';
+  ctx2.font = '8px IBM Plex Mono'; ctx2.textAlign = 'center';
+  [0, Math.floor(d/4), Math.floor(d/2), Math.floor(3*d/4), d-1].forEach(j => {
+    ctx2.fillText('d='+j, j*cellW+cellW/2, T*cellH+14);
+  });
+}
+
+// ===== Q/K/V PROJECTION VIZ (from multi.py) =====
+function drawQKV() {
+  const heads = parseInt(document.getElementById('qkv-heads').value);
+  const d_model = 8; // small for display
+  const d_head = d_model / heads;
+  const T = 4; // show 4 tokens
+
+  const rng = seededRand(99);
+  const randn = () => (rng()-0.5)*2;
+
+  // X: T × d_model  (token embeddings, simulated)
+  const X = Array.from({length:T}, () => Array.from({length:d_model}, randn));
+  // Weight matrices  (W_Q, W_K, W_V: d_model × d_model)
+  const W_Q = Array.from({length:d_model}, () => Array.from({length:d_model}, randn));
+  const W_K = Array.from({length:d_model}, () => Array.from({length:d_model}, randn));
+  // Matmul helper
+  const matmul = (A,B) => A.map(row => B[0].map((_,j) => row.reduce((s,v,k)=>s+v*B[k][j],0)));
+  const Q = matmul(X, W_Q); // T × d_model
+  const K = matmul(X, W_K);
+
+  // Build display HTML
+  const container = document.getElementById('qkv-display');
+  const tokenLabels = ['Token 0', 'Token 1', 'Token 2', 'Token 3'];
+  const colors = ['#1a3a6b','#8b6914','#1a5c3a','#6b1a1a'];
+
+  let html = '';
+
+  // For each head, show score matrix
+  for(let h=0;h<heads;h++) {
+    const start = h * d_head, end = start + d_head;
+    // Slice Q,K to this head
+    const Qh = Q.map(row => row.slice(start,end));
+    const Kh = K.map(row => row.slice(start,end));
+    // Score matrix T×T
+    const scale = Math.sqrt(d_head);
+    const scores = Qh.map((q,i) => Kh.map((k,j) => {
+      const raw = q.reduce((s,v,di)=>s+v*k[di],0) / scale;
+      return j > i ? null : raw; // causal mask
+    }));
+    const allScores = scores.flat().filter(v=>v!==null);
+    const minS=Math.min(...allScores), maxS=Math.max(...allScores);
+
+    html += `<div style="background:var(--paper2);border:1px solid var(--rule);padding:14px;">`;
+    html += `<div style="font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">Head ${h+1} — scores Q·Kᵀ/√${d_head.toFixed(0)}</div>`;
+    html += `<div style="display:grid;grid-template-columns:repeat(${T+1},1fr);gap:2px;">`;
+    // Header row
+    html += `<div></div>`;
+    for(let j=0;j<T;j++) html += `<div style="font-family:var(--mono);font-size:8px;color:var(--muted);text-align:center;padding:2px 0;">T${j}</div>`;
+    // Score rows
+    for(let i=0;i<T;i++) {
+      html += `<div style="font-family:var(--mono);font-size:8px;color:var(--muted);display:flex;align-items:center;padding-right:3px;">T${i}</div>`;
+      for(let j=0;j<T;j++) {
+        const v = scores[i][j];
+        if(v===null) {
+          html += `<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05);padding:4px 2px;text-align:center;font-family:var(--mono);font-size:8px;color:rgba(255,255,255,0.12);">×</div>`;
+        } else {
+          const norm = (v-minS)/(maxS-minS+0.001);
+          const r2=Math.round(10+norm*30),g2=Math.round(20+norm*150),b2=Math.round(80+norm*120);
+          html += `<div style="background:rgb(${r2},${g2},${b2});padding:4px 2px;text-align:center;font-family:var(--mono);font-size:8px;color:${norm>0.45?'rgba(0,0,0,0.8)':'rgba(255,255,255,0.7)'};">${v.toFixed(1)}</div>`;
+        }
+      }
+    }
+    html += `</div></div>`;
+  }
+
+  // Also show Q vector for token 0 as a bar chart
+  html += `<div style="background:var(--paper2);border:1px solid var(--rule);padding:14px;grid-column:1/-1;">`;
+  html += `<div style="font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">Q vector for each token (all ${d_model} dims)</div>`;
+  html += `<div style="display:flex;flex-direction:column;gap:5px;">`;
+  Q.forEach((q,ti) => {
+    const maxAbs = Math.max(...q.map(Math.abs), 0.01);
+    html += `<div style="display:flex;align-items:center;gap:8px;">`;
+    html += `<span style="font-family:var(--mono);font-size:9px;color:${colors[ti]};width:44px;flex-shrink:0;">Token ${ti}</span>`;
+    html += `<div style="flex:1;display:flex;gap:1px;align-items:center;">`;
+    q.forEach(v => {
+      const pct = Math.abs(v)/maxAbs*100;
+      html += `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;">
+        <div style="width:100%;height:${v>0?Math.round(pct*0.2):1}px;background:${colors[ti]};opacity:0.8;"></div>
+        <div style="width:1px;height:2px;background:var(--rule);"></div>
+        <div style="width:100%;height:${v<0?Math.round(pct*0.2):1}px;background:var(--red);opacity:0.6;"></div>
+      </div>`;
+    });
+    html += `</div></div>`;
+  });
+  html += `</div></div>`;
+
+  container.innerHTML = html;
+  container.style.gridTemplateColumns = heads <= 2 ? '1fr 1fr' : '1fr 1fr';
+}
+
 function drawAttention(){
   const text=document.getElementById('tf-text')?.value||'the cat sat';
   const tokens=text.trim().split(/\s+/).filter(t=>t.length>0);
@@ -1434,6 +1611,8 @@ function drawAttention(){
   x.fillText('← masked (future)', off+n*cell*0.7, off+cell*0.4);
 }
 setTimeout(drawAttention,200);
+setTimeout(drawPosEncoding,200);
+setTimeout(drawQKV,200);
 
 // ===== PLACEMENT =====
 function predictPlacement(){

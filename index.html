@@ -713,9 +713,9 @@ label {
     </div>
     <div id="activ-label" style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:8px;min-height:18px;text-align:center;"></div>
     <div style="display:flex;gap:20px;margin-top:10px;font-family:var(--mono);font-size:11px;color:var(--muted);flex-wrap:wrap;">
-      <div><span style="display:inline-block;width:20px;height:2px;background:var(--blue);vertical-align:middle;margin-right:6px;"></span>tanh(x) — used in Neuron class</div>
+      <div><span style="display:inline-block;width:20px;height:2px;background:#aaa;vertical-align:middle;margin-right:6px;"></span>tanh(x) — used in Neuron class</div>
       <div><span style="display:inline-block;width:20px;height:2px;background:var(--red);vertical-align:middle;margin-right:6px;"></span>relu(x) — implemented in Value</div>
-      <div><span style="display:inline-block;width:20px;height:2px;background:#aaa;vertical-align:middle;margin-right:6px;border-top:1px dashed #aaa;"></span>tanh derivative: 1 − tanh²(x)</div>
+      <div><span style="display:inline-block;width:20px;height:2px;background:var(--red);vertical-align:middle;margin-right:6px;border-top:1px dashed var(--red);"></span>tanh derivative: 1 − tanh²(x)</div>
     </div>
   </div>
 
@@ -1463,7 +1463,7 @@ function drawActivations() {
   [-1,0,1].forEach(v=>ctx.fillText(v,pad.l-3,toY(v)+3));
 
   // tanh
-  ctx.beginPath(); ctx.strokeStyle='rgba(26,58,107,0.9)'; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.strokeStyle='rgba(100,100,100,0.4)'; ctx.lineWidth=2;
   for(let px=0;px<=iW;px++) {
     const x=xMin+(xMax-xMin)*px/iW;
     const y=Math.tanh(x);
@@ -1481,7 +1481,7 @@ function drawActivations() {
   ctx.stroke();
 
   // tanh derivative: 1 - tanh²(x)
-  ctx.beginPath(); ctx.strokeStyle='rgba(100,100,100,0.4)'; ctx.lineWidth=1; ctx.setLineDash([4,3]);
+  ctx.beginPath(); ctx.strokeStyle='rgba(180,30,30,0.8)'; ctx.lineWidth=1; ctx.setLineDash([4,3]);
   for(let px=0;px<=iW;px++) {
     const x=xMin+(xMax-xMin)*px/iW;
     const t=Math.tanh(x); const y=1-t*t; // tanh backward from your code
